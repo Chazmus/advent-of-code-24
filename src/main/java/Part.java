@@ -8,6 +8,6 @@
 
 import java.util.List;
 
-public abstract class Problem {
+public abstract class Part {
     abstract int solve(List<String> inputArray);
 }

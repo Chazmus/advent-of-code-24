@@ -17,14 +17,14 @@ import utils.FileUtils;
 
 public abstract class TestBase {
 
-    Problem problem;
+    private Part part;
 
     @BeforeEach
     void setup() {
-        problem = getProblem();
+        part = getPart();
     }
 
-    protected abstract Problem getProblem();
+    protected abstract Part getPart();
 
     protected abstract Map<String, Integer> getExamples();
 
@@ -40,7 +40,7 @@ public abstract class TestBase {
 
     protected void runExample(String input, int expected) {
         var inputArray = Arrays.stream(input.split(System.lineSeparator())).toList();
-        var result = problem.solve(inputArray);
+        var result = part.solve(inputArray);
         Assertions.assertEquals(expected, result);
         System.out.println(result);
     }
@@ -49,7 +49,7 @@ public abstract class TestBase {
     protected void runFinalTest() {
         var inputFile = getInputFileName();
         var input = FileUtils.readFileFromResources(inputFile);
-        var result = problem.solve(input);
+        var result = part.solve(input);
         System.out.println(result);
     }
 }
