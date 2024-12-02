@@ -7,27 +7,37 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AdventOfCodeClient {
+    private final String ENV_FILE = "src/main/resources/.env";
 
-    public void getInput(String day) {
-        // TODO: get session cookie
-        var sessionCookie = "asdf";
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://adventofcode.com/2024/day/1/input"))
-                .GET()
-                .setHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp," +
-                        "image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-                .setHeader("cookie", sessionCookie)
-                .build();
-
+    public String getInput(String day) {
         try {
+            // Define the regex pattern to capture two parts: text and number
+            String regex = "^[a-zA-Z]+(\\d+)$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(day.toLowerCase());
+            if (!matcher.find()) {
+                throw new RuntimeException("Invalid day format");
+            }
+            var dayNumber = matcher.group(1);
+
+            var envFile = Files.readAllLines(Paths.get(ENV_FILE));
+            var sessionCookie = envFile.get(0);
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://adventofcode.com/2024/day/" + dayNumber + "/input"))
+                    .GET()
+                    .setHeader("cookie", "session=" + sessionCookie)
+                    .build();
+
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            // Write file into resources
-            var filePath = Paths.get("src/main/resources/" + day);
-            Files.writeString(filePath, response.body(), StandardOpenOption.SYNC, StandardOpenOption.CREATE);
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Can't get the input file");
+            }
+            return response.body();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

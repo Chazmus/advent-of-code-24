@@ -1,9 +1,13 @@
+package problems.day1;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import problems.ProblemBase;
 
 public class Day1 extends ProblemBase {
     @Override

@@ -1,7 +1,10 @@
+package problems;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -72,22 +75,19 @@ public abstract class ProblemBase {
 
     private List<String> getInput() {
         var day = getClass().getSimpleName();
-        ClassLoader classLoader = ProblemBase.class.getClassLoader();
         try {
-            var resource = classLoader.getResource(day);
-            if (resource == null) {
-                var client = new AdventOfCodeClient();
-                client.getInput(day);
-                classLoader = ProblemBase.class.getClassLoader();
-                resource = classLoader.getResource(day);
+            // load a file from resources folder
+            var path = Paths.get("src/main/resources/" + day);
+            if (!path.toFile().exists()) {
+                var data = new AdventOfCodeClient().getInput(day);
+                Files.writeString(path, data);
             }
-            var filePath = Paths.get(resource.toURI());
-            var lines = Files.readAllLines(filePath);
+            var lines = Files.readAllLines(path);
             if (lines.getLast().isBlank()) {
                 lines.removeLast();
             }
             return lines;
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Can't read the input file");
         }
     }
