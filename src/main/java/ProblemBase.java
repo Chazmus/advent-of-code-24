@@ -5,7 +5,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +15,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import client.AdventOfCodeClient;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -70,14 +71,22 @@ public abstract class ProblemBase {
     }
 
     private List<String> getInput() {
-        var inputFile = getClass().getSimpleName();
+        var day = getClass().getSimpleName();
         ClassLoader classLoader = ProblemBase.class.getClassLoader();
         try {
-            var path = Paths.get(classLoader.getResource(inputFile).toURI());
-            try (var stream = Files.lines(path)) {
-                return stream.filter(line -> !line.isBlank())
-                        .collect(Collectors.toList());
+            var resource = classLoader.getResource(day);
+            if (resource == null) {
+                var client = new AdventOfCodeClient();
+                client.getInput(day);
+                classLoader = ProblemBase.class.getClassLoader();
+                resource = classLoader.getResource(day);
             }
+            var filePath = Paths.get(resource.toURI());
+            var lines = Files.readAllLines(filePath);
+            if (lines.getLast().isBlank()) {
+                lines.removeLast();
+            }
+            return lines;
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException("Can't read the input file");
         }
