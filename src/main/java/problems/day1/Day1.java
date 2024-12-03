@@ -70,7 +70,7 @@ public class Day1 extends ProblemBase {
                 3   3
                 """;
         var expected = 11L;
-        return Stream.of(new AbstractMap.SimpleEntry<>(input, expected));
+        return Stream.of(Map.entry(input, expected));
     }
 
     @Override
@@ -84,6 +84,6 @@ public class Day1 extends ProblemBase {
                 3   3
                 """;
         var expected = 31L;
-        return Stream.of(new AbstractMap.SimpleEntry<>(input, expected));
+        return Stream.of(Map.entry(input, expected));
     }
 }
