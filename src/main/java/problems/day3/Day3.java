@@ -14,33 +14,29 @@ public class Day3 extends ProblemBase {
 
     @Override
     public Long solvePart1(List<String> inputArray) {
-        var total = 0L;
-        for (var line : inputArray) {
-            var matcher = mulPattern.matcher(line);
-            while (matcher.find()) {
-                var first = Long.parseLong(matcher.group(1));
-                var second = Long.parseLong(matcher.group(2));
-                total += first * second;
-            }
-        }
+        return solve(String.join("", inputArray));
+    }
 
+    public Long solve(String input) {
+        var total = 0L;
+        var matcher = mulPattern.matcher(input);
+        while (matcher.find()) {
+            total += Long.parseLong(matcher.group(1)) * Long.parseLong(matcher.group(2));
+        }
         return total;
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        var totalLine = inputArray.get(0);
-        String regex = "(?<=don't\\(\\))(.*?)(?=do\\(\\))";
-        String result = totalLine.replaceAll(regex, "");
-        return solvePart1(List.of(result));
+        var input = String.join("", inputArray)
+                .replaceAll("(?<=don't\\(\\))(.*?)(?=do\\(\\))", "");
+        return solve(input);
     }
 
     @Override
     public Stream<Map.Entry<String, Long>> getPart1Examples() {
-        var input = """
-                xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))""";
-        var expected = 161L;
-        return Stream.of(entry(input, expected));
+        return Stream.of(entry("""
+                xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))""", 161L));
     }
 
     @Override
