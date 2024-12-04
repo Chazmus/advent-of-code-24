@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class LinearMask {
 
-    private final List<Vector2> maskVecs;
+    private final List<Vector2> maskVectors;
 
     /**
      * Create a new linear mask with the specified direction and length.
@@ -22,11 +22,11 @@ public class LinearMask {
         for (var i = 0; i < length; i++) {
             mask.add(directionVector.multiply(i));
         }
-        this.maskVecs = normalizedVectors(mask);
+        this.maskVectors = normalizedVectors(mask);
     }
 
-    private LinearMask(List<Vector2> maskVecs) {
-        this.maskVecs = maskVecs;
+    private LinearMask(List<Vector2> maskVectors) {
+        this.maskVectors = maskVectors;
     }
 
     private List<List<Character>> getAllCharSets(Grid grid) {
@@ -34,7 +34,7 @@ public class LinearMask {
         for (var i = 0; i < grid.getColumns(); i++) {
             for (var j = 0; j < grid.getRows(); j++) {
                 var set = new ArrayList<Character>();
-                for (var maskCoordinate : maskVecs) {
+                for (var maskCoordinate : maskVectors) {
                     var x = i + maskCoordinate.x();
                     var y = j + maskCoordinate.y();
                     if (grid.isWithinBounds(x, y)) {
@@ -74,7 +74,7 @@ public class LinearMask {
      */
     public LinearMask rotateRight() {
         var newMask = new ArrayList<Vector2>();
-        for (var vector : maskVecs) {
+        for (var vector : maskVectors) {
             newMask.add(Vector2.of(vector.y(), -vector.x()));
         }
         return normalized(newMask);
