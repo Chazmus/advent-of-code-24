@@ -14,24 +14,23 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import problems.ProblemBase;
+import utils.Direction;
 import utils.Grid;
 import utils.LinearMask;
-import utils.Vector2;
 import utils.WindowMask;
 
 public class Day4 extends ProblemBase {
     @Override
     public Long solvePart1(List<String> inputArray) {
         var grid = new Grid(inputArray);
-        var horizontalMask = new LinearMask(List.of(Vector2.of(0, 0), Vector2.of(0, 1), Vector2.of(0, 2),
-                Vector2.of(0, 3)));
-        var verticalMask = horizontalMask.rotateRight();
-        var diagMask = new LinearMask(List.of(Vector2.of(0, 0), Vector2.of(1, 1), Vector2.of(2, 2), Vector2.of(3, 3)));
-        var otherDiag = diagMask.rotateRight();
+        var horizontalMask = new LinearMask(Direction.RIGHT, 4);
+        var verticalMask = new LinearMask(Direction.DOWN, 4);
+        var diagMask = new LinearMask(Direction.DOWN_RIGHT, 4);
+        var otherDiagMask = new LinearMask(Direction.DOWN_LEFT, 4);
         var masks = List.of(
                 horizontalMask,
                 diagMask,
-                otherDiag,
+                otherDiagMask,
                 verticalMask
         );
         var totalXmas = 0L;
@@ -53,8 +52,8 @@ public class Day4 extends ProblemBase {
         var mask = new WindowMask(3, 3);
         var search = "MAS";
         var subGrids = mask.getAllSubGrids(grid);
-        var diagMask = new LinearMask(List.of(Vector2.of(0, 0), Vector2.of(1, 1), Vector2.of(2, 2)));
-        var otherDiag = new LinearMask(List.of(Vector2.of(0, 2), Vector2.of(1, 1), Vector2.of(2, 0)));;
+        var diagMask = new LinearMask(Direction.DOWN_RIGHT, 3);
+        var otherDiag = new LinearMask(Direction.DOWN_LEFT, 3);
         var totalMas = 0L;
         for (var subGrid : subGrids) {
             var words1 = diagMask.getAllStrings(subGrid, true);

@@ -25,13 +25,7 @@ public class LinearMask {
         this.mask = mask;
     }
 
-    /**
-     * Create a new linear mask with the specified mask.
-     * TODO: really this linear mask should be initialized with a direction and a length
-     *
-     * @param mask The mask to use.
-     */
-    public LinearMask(List<Vector2> mask) {
+    private LinearMask(List<Vector2> mask) {
         this.mask = mask;
     }
 
