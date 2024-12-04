@@ -28,7 +28,7 @@ public class WindowMask {
                     for (var y = 0; y < height; y++) {
                         var xCoord = i + x;
                         var yCoord = j + y;
-                        if (!grid.isOutOfBounds(xCoord, yCoord)) {
+                        if (grid.isWithinBounds(xCoord, yCoord)) {
                             set.set(x, y, grid.get(xCoord, yCoord));
                         }
                     }

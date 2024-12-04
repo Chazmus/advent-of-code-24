@@ -58,7 +58,14 @@ public class Grid {
         return x < 0 || x >= getRows() || y < 0 || y >= getColumns();
     }
 
+    public boolean isWithinBounds(int x, int y) {
+        return !isOutOfBounds(x, y);
+    }
+
     public boolean isOutOfBounds(Vector2 coordinate) {
         return isOutOfBounds(coordinate.x(), coordinate.y());
+    }
+    public boolean isWithinBounds(Vector2 coordinate) {
+        return isWithinBounds(coordinate.x(), coordinate.y());
     }
 }

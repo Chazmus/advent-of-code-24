@@ -26,7 +26,7 @@ public class LinearMask {
                 for (var maskCoordinate : mask) {
                     var x = i + maskCoordinate.x();
                     var y = j + maskCoordinate.y();
-                    if (!grid.isOutOfBounds(x, y)) {
+                    if (grid.isWithinBounds(x, y)) {
                         set.add(grid.get(x, y));
                     }
                 }
