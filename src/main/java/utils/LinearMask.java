@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class LinearMask {
 
-    private final List<Vector2> mask;
+    private final List<Vector2> maskVecs;
 
     /**
      * Create a new linear mask with the specified direction and length.
@@ -22,11 +22,11 @@ public class LinearMask {
         for (var i = 0; i < length; i++) {
             mask.add(directionVector.multiply(i));
         }
-        this.mask = mask;
+        this.maskVecs = normalizedVectors(mask);
     }
 
-    private LinearMask(List<Vector2> mask) {
-        this.mask = mask;
+    private LinearMask(List<Vector2> maskVecs) {
+        this.maskVecs = maskVecs;
     }
 
     private List<List<Character>> getAllCharSets(Grid grid) {
@@ -34,7 +34,7 @@ public class LinearMask {
         for (var i = 0; i < grid.getColumns(); i++) {
             for (var j = 0; j < grid.getRows(); j++) {
                 var set = new ArrayList<Character>();
-                for (var maskCoordinate : mask) {
+                for (var maskCoordinate : maskVecs) {
                     var x = i + maskCoordinate.x();
                     var y = j + maskCoordinate.y();
                     if (grid.isWithinBounds(x, y)) {
@@ -74,7 +74,7 @@ public class LinearMask {
      */
     public LinearMask rotateRight() {
         var newMask = new ArrayList<Vector2>();
-        for (var vector : mask) {
+        for (var vector : maskVecs) {
             newMask.add(Vector2.of(vector.y(), -vector.x()));
         }
         return normalized(newMask);
@@ -86,10 +86,15 @@ public class LinearMask {
      * @param newMask The mask to normalize.
      * @return A new mask that is normalized.
      */
-    private static LinearMask normalized(ArrayList<Vector2> newMask) {
+    private static LinearMask normalized(List<Vector2> newMask) {
+        var normalizedMask = normalizedVectors(newMask);
+        return new LinearMask(normalizedMask);
+    }
+
+    private static List<Vector2> normalizedVectors(List<Vector2> newMask) {
         var minX = newMask.stream().map(Vector2::x).min(Integer::compareTo).get();
         var minY = newMask.stream().map(Vector2::y).min(Integer::compareTo).get();
         var normalizedMask = newMask.stream().map(v -> Vector2.of(v.x() - minX, v.y() - minY)).toList();
-        return new LinearMask(normalizedMask);
+        return normalizedMask;
     }
 }
