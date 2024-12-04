@@ -36,11 +36,28 @@ public class LinearMask {
         return sets;
     }
 
+    public List<String> getAllStrings(Grid grid, boolean includeReverse) {
+        var strings = new ArrayList<String>();
+        for (var set : getAllSets(grid)) {
+            var word = set.stream().map(String::valueOf).reduce("", String::concat);
+            strings.add(word);
+            if (includeReverse) {
+                var reverse = new StringBuilder(word).reverse().toString();
+                strings.add(reverse);
+            }
+        }
+        return strings;
+    }
+
     public LinearMask rotateRight() {
         var newMask = new ArrayList<Vector2>();
         for (var vector : mask) {
             newMask.add(Vector2.of(vector.y(), -vector.x()));
         }
-        return new LinearMask(newMask);
+        // Normalize the mask
+        var minX = newMask.stream().map(Vector2::x).min(Integer::compareTo).get();
+        var minY = newMask.stream().map(Vector2::y).min(Integer::compareTo).get();
+        var normalizedMask = newMask.stream().map(v -> Vector2.of(v.x() - minX, v.y() - minY)).toList();
+        return new LinearMask(normalizedMask);
     }
 }

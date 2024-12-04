@@ -37,14 +37,9 @@ public class Day4 extends ProblemBase {
         var totalXmas = 0L;
         var search = "XMAS";
         for (var mask : masks) {
-            var sets = mask.getAllSets(grid);
-            for (var set : sets) {
-                var word = set.stream().map(String::valueOf).reduce("", String::concat);
+            var strings = mask.getAllStrings(grid, true);
+            for (var word : strings) {
                 if (word.equals(search)) {
-                    totalXmas++;
-                }
-                var reverse = new StringBuilder(word).reverse().toString();
-                if (reverse.equals(search)) {
                     totalXmas++;
                 }
             }
