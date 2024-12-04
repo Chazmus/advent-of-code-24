@@ -1,11 +1,11 @@
 package problems.day1;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 
@@ -60,7 +60,7 @@ public class Day1 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart1Examples() {
+    public Stream<Arguments> getPart1Examples() {
         var input = """
                 3   4
                 4   3
@@ -70,11 +70,11 @@ public class Day1 extends ProblemBase {
                 3   3
                 """;
         var expected = 11L;
-        return Stream.of(Map.entry(input, expected));
+        return Stream.of(Arguments.of(input, expected));
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart2Examples() {
+    public Stream<Arguments> getPart2Examples() {
         String input = """
                 3   4
                 4   3
@@ -84,6 +84,6 @@ public class Day1 extends ProblemBase {
                 3   3
                 """;
         var expected = 31L;
-        return Stream.of(Map.entry(input, expected));
+        return Stream.of(Arguments.of(input, expected));
     }
 }

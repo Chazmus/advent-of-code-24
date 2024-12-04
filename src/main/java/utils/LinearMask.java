@@ -2,6 +2,7 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Represents a linear mask that can be applied to a grid.
@@ -30,21 +31,23 @@ public class LinearMask {
     }
 
     private List<List<Character>> getAllCharSets(Grid grid) {
-        var sets = new ArrayList<List<Character>>();
-        for (var i = 0; i < grid.getColumns(); i++) {
-            for (var j = 0; j < grid.getRows(); j++) {
-                var set = new ArrayList<Character>();
-                for (var maskCoordinate : maskVectors) {
-                    var x = i + maskCoordinate.x();
-                    var y = j + maskCoordinate.y();
-                    if (grid.isWithinBounds(x, y)) {
-                        set.add(grid.get(x, y));
-                    }
-                }
-                sets.add(set);
-            }
-        }
-        return sets;
+        return getAllCharSetsStream(grid).toList();
+    }
+
+    private Stream<List<Character>> getAllCharSetsStream(Grid grid) {
+        return Stream.iterate(0, i -> i < grid.getColumns(), i -> i + 1)
+                .flatMap(i -> Stream.iterate(0, j -> j < grid.getRows(), j -> j + 1)
+                        .map(j -> {
+                            var set = new ArrayList<Character>();
+                            for (var maskCoordinate : maskVectors) {
+                                var x = i + maskCoordinate.x();
+                                var y = j + maskCoordinate.y();
+                                if (grid.isWithinBounds(x, y)) {
+                                    set.add(grid.get(x, y));
+                                }
+                            }
+                            return set;
+                        }));
     }
 
     /**
@@ -65,6 +68,12 @@ public class LinearMask {
             }
         }
         return strings;
+    }
+
+    public Stream<String> getAllStringsStream(Grid grid, boolean includeReverse) {
+        return getAllCharSets(grid).stream()
+                .map(set -> set.stream().map(String::valueOf).reduce("", String::concat))
+                .flatMap(word -> Stream.of(word, includeReverse ? new StringBuilder(word).reverse().toString() : ""));
     }
 
     /**

@@ -1,11 +1,10 @@
 package problems.day3;
 
-import static java.util.Map.entry;
-
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 
@@ -34,14 +33,14 @@ public class Day3 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart1Examples() {
-        return Stream.of(entry("""
+    public Stream<Arguments> getPart1Examples() {
+        return Stream.of(Arguments.of("""
                 xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))""", 161L));
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart2Examples() {
-        return Stream.of(entry("""
+    public Stream<Arguments> getPart2Examples() {
+        return Stream.of(Arguments.of("""
                 xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))""", 48L));
     }
 }

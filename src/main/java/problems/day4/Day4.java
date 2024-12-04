@@ -1,18 +1,10 @@
-/*
- * Copyright 2024 ForgeRock AS. All Rights Reserved
- *
- * Use of this code requires a commercial software license with ForgeRock AS.
- * or with one of its affiliates. All use shall be exclusively subject
- * to such license between the licensee and ForgeRock AS.
- */
 package problems.day4;
-
-import static java.util.Map.entry;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 import utils.Direction;
@@ -54,8 +46,8 @@ public class Day4 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart1Examples() {
-        return Stream.of(entry("""
+    public Stream<Arguments> getPart1Examples() {
+        return Stream.of(Arguments.of("""
                 MMMSXXMASM
                 MSAMXMSMSA
                 AMXSXMAAMM
@@ -70,8 +62,8 @@ public class Day4 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart2Examples() {
-        return Stream.of(entry("""
+    public Stream<Arguments> getPart2Examples() {
+        return Stream.of(Arguments.of("""
                 MMMSXXMASM
                 MSAMXMSMSA
                 AMXSXMAAMM

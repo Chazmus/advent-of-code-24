@@ -1,11 +1,11 @@
 package problems.day2;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 
@@ -174,8 +174,9 @@ public class Day2 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart1Examples() {
-        return Stream.of(Map.entry("""
+    public Stream<Arguments> getPart1Examples() {
+        return Stream.of(
+                Arguments.of("""
                 7 6 4 2 1
                 1 2 7 8 9
                 9 7 6 2 1
@@ -185,8 +186,8 @@ public class Day2 extends ProblemBase {
     }
 
     @Override
-    public Stream<Map.Entry<String, Long>> getPart2Examples() {
-        return Stream.of(Map.entry("""
+    public Stream<Arguments> getPart2Examples() {
+        return Stream.of(Arguments.of("""
                 7 6 4 2 1
                 1 2 7 8 9
                 9 7 6 2 1

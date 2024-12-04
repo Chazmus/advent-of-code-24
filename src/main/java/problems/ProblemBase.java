@@ -1,10 +1,8 @@
 package problems;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import client.AdventOfCodeClient;
@@ -29,18 +28,17 @@ public abstract class ProblemBase {
 
     public abstract Long solvePart2(List<String> inputArray);
 
-    public abstract Stream<Map.Entry<String, Long>> getPart1Examples();
+    public abstract Stream<Arguments> getPart1Examples();
 
-    public abstract Stream<Map.Entry<String, Long>> getPart2Examples();
+    public abstract Stream<Arguments> getPart2Examples();
 
 
     @ParameterizedTest()
     @MethodSource("getPart1Examples")
     @Order(0)
-    public void runPart1Examples(Map.Entry<String, Long> entry) {
-        var input = Arrays.stream(entry.getKey().split(System.lineSeparator())).toList();
-        var solution = solvePart1(input);
-        var expected = entry.getValue();
+    public void runPart1Examples(String input, Long expected) {
+        var inputList = Arrays.stream(input.split(System.lineSeparator())).toList();
+        var solution = solvePart1(inputList);
         Assertions.assertEquals(expected, solution);
         System.out.println(solution);
     }
@@ -57,10 +55,9 @@ public abstract class ProblemBase {
     @ParameterizedTest
     @MethodSource("getPart2Examples")
     @Order(2)
-    public void runPart2Examples(Map.Entry<String, Long> entry) {
-        var input = Arrays.stream(entry.getKey().split(System.lineSeparator())).toList();
-        var expected = entry.getValue();
-        var solution = solvePart2(input);
+    public void runPart2Examples(String input, Long expected) {
+        var inputList = Arrays.stream(input.split(System.lineSeparator())).toList();
+        var solution = solvePart2(inputList);
         Assertions.assertEquals(expected, solution);
         System.out.println(solution);
     }
