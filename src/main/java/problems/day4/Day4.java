@@ -52,15 +52,19 @@ public class Day4 extends ProblemBase {
         var grid = new Grid(inputArray);
         var mask = new WindowMask(3, 3);
         var search = "MAS";
-        var sets = mask.getAllSets(grid);
+        var subGrids = mask.getAllSubGrids(grid);
         var diagMask = new LinearMask(List.of(Vector2.of(0, 0), Vector2.of(1, 1), Vector2.of(2, 2)));
         var otherDiag = new LinearMask(List.of(Vector2.of(0, 2), Vector2.of(1, 1), Vector2.of(2, 0)));;
         var totalMas = 0L;
-        for (var set : sets) {
-            var word1 = diagMask.getAllSets(set).get(0).stream().map(String::valueOf).reduce("", String::concat);
-            var word2 = otherDiag.getAllSets(set).get(0).stream().map(String::valueOf).reduce("", String::concat);
-            if ((word1.equals(search) || new StringBuilder(word1).reverse().toString().equals(search)) &&
-                    (word2.equals(search) || new StringBuilder(word2).reverse().toString().equals(search))) {
+        for (var subGrid : subGrids) {
+            var words1 = diagMask.getAllStrings(subGrid, true);
+            var word1 = words1.get(0);
+            var reversedWord1 = words1.get(1);
+            var words2 = otherDiag.getAllStrings(subGrid, true);
+            var word2 = words2.get(0);
+            var reversedWord2 = words2.get(1);
+            if ((word1.equals(search) || reversedWord1.equals(search)) &&
+                    (word2.equals(search) || reversedWord2.equals(search))) {
                 totalMas++;
             }
         }

@@ -7,6 +7,9 @@
  */
 package utils;
 
+/**
+ * Represents a 2D vector.
+ */
 public record Vector2(int x, int y) {
 
     public static Vector2 of(int x, int y) {
