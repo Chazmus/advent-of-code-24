@@ -9,6 +9,7 @@ package problems.day4;
 
 import static java.util.Map.entry;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -23,52 +24,33 @@ public class Day4 extends ProblemBase {
     @Override
     public Long solvePart1(List<String> inputArray) {
         var grid = new Grid(inputArray);
-        var horizontalMask = new LinearMask(Direction.RIGHT, 4);
-        var verticalMask = new LinearMask(Direction.DOWN, 4);
-        var diagMask = new LinearMask(Direction.DOWN_RIGHT, 4);
-        var otherDiagMask = new LinearMask(Direction.DOWN_LEFT, 4);
         var masks = List.of(
-                horizontalMask,
-                diagMask,
-                otherDiagMask,
-                verticalMask
+                new LinearMask(Direction.RIGHT, 4),
+                new LinearMask(Direction.DOWN, 4),
+                new LinearMask(Direction.DOWN_RIGHT, 4),
+                new LinearMask(Direction.DOWN_LEFT, 4)
         );
-        var totalXmas = 0L;
-        var search = "XMAS";
-        for (var mask : masks) {
-            var strings = mask.getAllStrings(grid, true);
-            for (var word : strings) {
-                if (word.equals(search)) {
-                    totalXmas++;
-                }
-            }
-        }
-        return totalXmas;
+        var searchTerm = "XMAS";
+        return masks.stream()
+                .map(mask -> mask.getAllStrings(grid, true))
+                .flatMap(Collection::stream)
+                .filter(word -> word.equals(searchTerm))
+                .count();
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
         var grid = new Grid(inputArray);
-        var mask = new WindowMask(3, 3);
-        var search = "MAS";
-        var subGrids = mask.getAllSubGrids(grid);
-        var diagMask = new LinearMask(Direction.DOWN_RIGHT, 3);
-        var otherDiag = new LinearMask(Direction.DOWN_LEFT, 3);
-        var totalMas = 0L;
-        for (var subGrid : subGrids) {
-            var words1 = diagMask.getAllStrings(subGrid, true);
-            var word1 = words1.get(0);
-            var reversedWord1 = words1.get(1);
-            var words2 = otherDiag.getAllStrings(subGrid, true);
-            var word2 = words2.get(0);
-            var reversedWord2 = words2.get(1);
-            if ((word1.equals(search) || reversedWord1.equals(search)) &&
-                    (word2.equals(search) || reversedWord2.equals(search))) {
-                totalMas++;
-            }
-        }
-
-        return totalMas;
+        var searchTerm = "MAS";
+        return new WindowMask(3, 3).getAllSubGrids(grid).stream()
+                .map(subGrid -> {
+                    var words1 = new LinearMask(Direction.DOWN_RIGHT, 3).getAllStrings(subGrid, true);
+                    var words2 = new LinearMask(Direction.DOWN_LEFT, 3).getAllStrings(subGrid, true);
+                    return List.of(words1.get(0), words1.get(1), words2.get(0), words2.get(1));
+                })
+                .filter(words -> (words.get(0).equals(searchTerm) || words.get(1).equals(searchTerm)) &&
+                        (words.get(2).equals(searchTerm) || words.get(3).equals(searchTerm)))
+                .count();
     }
 
     @Override
