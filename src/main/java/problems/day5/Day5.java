@@ -61,18 +61,7 @@ public class Day5 extends ProblemBase {
     }
 
     private boolean getIsValid(List<Vector2> rules, List<Integer> page) {
-        var pageToRulesThatApply = new HashMap<Integer, List<Vector2>>();
-        page.forEach(p -> {
-            rules.forEach(r -> {
-                if (p == r.x() || p <= r.y()) {
-                    if (!pageToRulesThatApply.containsKey(p)) {
-                        pageToRulesThatApply.put(p, new ArrayList<>());
-                    }
-                    pageToRulesThatApply.get(p).add(r);
-                }
-            });
-        });
-
+        var pageToRulesThatApply = getPageToRulesMap(rules, page);
         for (var entry : pageToRulesThatApply.entrySet()) {
             var listOfRules = entry.getValue();
             for (var rule : listOfRules) {
@@ -90,6 +79,21 @@ public class Day5 extends ProblemBase {
         return true;
     }
 
+    private static HashMap<Integer, List<Vector2>> getPageToRulesMap(List<Vector2> rules, List<Integer> page) {
+        var pageToRulesThatApply = new HashMap<Integer, List<Vector2>>();
+        page.forEach(p -> {
+            rules.forEach(r -> {
+                if (p == r.x() || p <= r.y()) {
+                    if (!pageToRulesThatApply.containsKey(p)) {
+                        pageToRulesThatApply.put(p, new ArrayList<>());
+                    }
+                    pageToRulesThatApply.get(p).add(r);
+                }
+            });
+        });
+        return pageToRulesThatApply;
+    }
+
     @Override
     public Long solvePart2(List<String> inputArray) {
         getRulesAndPages result = getGetRulesAndPages(inputArray);
@@ -103,29 +107,18 @@ public class Day5 extends ProblemBase {
             var isValid = getIsValid(rules, page);
             if (isValid) continue;
             var mutablePage = new LinkedList<>(page);
-            while (!getIsValid(rules, mutablePage)) {
-                reorderPage(rules, mutablePage);
-            }
+            // Thought I would need the while loop... but apparently it only needs to be reordered once
+            // while (!getIsValid(rules, mutablePage)) {
+            reorderPage(rules, mutablePage);
+            //}
             result += getMiddleValue(mutablePage);
             calculated++;
-            System.out.println(calculated);
         }
         return result;
     }
 
     private void reorderPage(List<Vector2> rules, LinkedList<Integer> page) {
-        var pageToRulesThatApply = new HashMap<Integer, List<Vector2>>();
-        page.forEach(p -> {
-            rules.forEach(r -> {
-                if (p == r.x() || p <= r.y()) {
-                    if (!pageToRulesThatApply.containsKey(p)) {
-                        pageToRulesThatApply.put(p, new ArrayList<>());
-                    }
-                    pageToRulesThatApply.get(p).add(r);
-                }
-            });
-        });
-
+        var pageToRulesThatApply = getPageToRulesMap(rules, page);
         for (var entry : pageToRulesThatApply.entrySet()) {
             var listOfRules = entry.getValue();
             for (var rule : listOfRules) {
