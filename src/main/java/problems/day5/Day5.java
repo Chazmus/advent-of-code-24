@@ -102,18 +102,9 @@ public class Day5 extends ProblemBase {
         for (var page : pages) {
             var isValid = getIsValid(rules, page);
             if (isValid) continue;
-
             var mutablePage = new LinkedList<>(page);
-            var invalidIndex = getInvalidPage(rules, page);
-            // move it one index higher
-            var invalidValue = mutablePage.get(invalidIndex);
-            mutablePage.remove(invalidValue);
-            mutablePage.add(invalidIndex + 1, invalidValue);
             while (!getIsValid(rules, mutablePage)) {
-                invalidIndex = getInvalidPage(rules, page);
-                invalidValue = mutablePage.get(invalidIndex);
-                mutablePage.remove(invalidValue);
-                mutablePage.add(invalidIndex + 1, invalidValue);
+                reorderPage(rules, mutablePage);
             }
             result += getMiddleValue(mutablePage);
             calculated++;
@@ -122,7 +113,7 @@ public class Day5 extends ProblemBase {
         return result;
     }
 
-    private Integer getInvalidPage(List<Vector2> rules, List<Integer> page) {
+    private void reorderPage(List<Vector2> rules, LinkedList<Integer> page) {
         var pageToRulesThatApply = new HashMap<Integer, List<Vector2>>();
         page.forEach(p -> {
             rules.forEach(r -> {
@@ -145,13 +136,12 @@ public class Day5 extends ProblemBase {
                 }
                 if (first > second) {
                     // Move the first to the second
-
-                    return page.indexOf(entry.getKey());
+                    var temp = page.get(first);
+                    page.remove(first);
+                    page.add(second, temp);
                 }
             }
         }
-
-        return -1;
     }
 
     private final String sampleInput = """
