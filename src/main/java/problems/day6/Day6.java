@@ -44,7 +44,7 @@ public class Day6 extends ProblemBase {
             this.map = map;
         }
 
-        public void walk() {
+        public void walk() throws Exception {
             var target = position.add(direction.toVector());
             if (map.isOutOfBounds(target)) {
                 // Check for the guard being out of bounds in the loop
@@ -57,7 +57,11 @@ public class Day6 extends ProblemBase {
             }
 
             position = target;
-            visited.add(new GuardState(position, direction));
+            var newState = new GuardState(position, direction);
+            if (visited.contains(newState)) {
+                throw new Exception("Guard is stuck in a loop");
+            }
+            visited.add(newState);
         }
 
         public boolean isStuckInLoop() {
@@ -72,7 +76,11 @@ public class Day6 extends ProblemBase {
         Grid map = new Grid(inputArray);
         Guard guard = new Guard(map);
         while (map.isWithinBounds(guard.position)) {
-            guard.walk();
+            try {
+                guard.walk();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         return (long) guard.visited.stream().map(v -> v.position).collect(Collectors.toSet()).size();
     }
@@ -83,16 +91,22 @@ public class Day6 extends ProblemBase {
         var total = 0L;
         for (int row = 0; row < map.getRows(); row++) {
             for (int column = 0; column < map.getColumns(); column++) {
+                System.out.println(row + " " + column);
                 if (map.get(row, column) == '.') {
                     var newMap = new Grid(map);
                     newMap.set(row, column, '#');
-                    var guard = new Guard(map);
+                    var guard = new Guard(newMap);
                     while (newMap.isWithinBounds(guard.position)) {
                         if (guard.isStuckInLoop()) {
                             total++;
                             break;
                         }
-                        guard.walk();
+                        try {
+                            guard.walk();
+                        } catch (Exception e) {
+                            total++;
+                            break;
+                        }
                     }
                 }
             }
@@ -133,28 +147,4 @@ public class Day6 extends ProblemBase {
                 """, 6L));
     }
 
-    @Test
-    public void testLoop() {
-        var map = new Grid(Arrays.stream("""
-                ....#.....
-                .........#
-                ..........
-                ..#.......
-                .......#..
-                ..........
-                .#..^.....
-                ........#.
-                #.........
-                ......##..
-                """.split(System.lineSeparator())).toList());
-
-        var guard = new Guard(map);
-        while (map.isWithinBounds(guard.position)) {
-            if (guard.isStuckInLoop()) {
-                var thing = "banana";
-                break;
-            }
-            guard.walk();
-        }
-    }
 }
