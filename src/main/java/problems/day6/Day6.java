@@ -63,12 +63,6 @@ public class Day6 extends ProblemBase {
             }
             visited.add(newState);
         }
-
-        public boolean isStuckInLoop() {
-            var target = position.add(direction.toVector());
-            return visited.contains(new GuardState(target, direction));
-        }
-
     }
 
     @Override
@@ -91,16 +85,11 @@ public class Day6 extends ProblemBase {
         var total = 0L;
         for (int row = 0; row < map.getRows(); row++) {
             for (int column = 0; column < map.getColumns(); column++) {
-                System.out.println(row + " " + column);
                 if (map.get(row, column) == '.') {
                     var newMap = new Grid(map);
                     newMap.set(row, column, '#');
                     var guard = new Guard(newMap);
                     while (newMap.isWithinBounds(guard.position)) {
-                        if (guard.isStuckInLoop()) {
-                            total++;
-                            break;
-                        }
                         try {
                             guard.walk();
                         } catch (Exception e) {
