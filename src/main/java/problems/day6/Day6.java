@@ -7,11 +7,14 @@
  */
 package problems.day6;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
@@ -20,11 +23,15 @@ import utils.Grid;
 import utils.Vector2;
 
 public class Day6 extends ProblemBase {
+
+    record GuardState(Vector2 position, Direction direction) {
+    }
+
     class Guard {
 
         Vector2 position;
         Direction direction;
-        Set<Vector2> visited;
+        Set<GuardState> visited;
         Grid map;
 
         public Guard(Grid map) {
@@ -32,7 +39,7 @@ public class Day6 extends ProblemBase {
             map.find('^').ifPresent(position -> {
                 this.position = position;
                 this.direction = Direction.UP;
-                this.visited.add(position);
+                this.visited.add(new GuardState(position, direction));
             });
             this.map = map;
         }
@@ -50,7 +57,12 @@ public class Day6 extends ProblemBase {
             }
 
             position = target;
-            visited.add(position);
+            visited.add(new GuardState(position, direction));
+        }
+
+        public boolean isStuckInLoop() {
+            var target = position.add(direction.toVector());
+            return visited.contains(new GuardState(target, direction));
         }
 
     }
@@ -62,12 +74,31 @@ public class Day6 extends ProblemBase {
         while (map.isWithinBounds(guard.position)) {
             guard.walk();
         }
-        return (long) guard.visited.size();
+        return (long) guard.visited.stream().map(v -> v.position).collect(Collectors.toSet()).size();
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        return 0L;
+        Grid map = new Grid(inputArray);
+        var total = 0L;
+        for (int row = 0; row < map.getRows(); row++) {
+            for (int column = 0; column < map.getColumns(); column++) {
+                if (map.get(row, column) == '.') {
+                    var newMap = new Grid(map);
+                    newMap.set(row, column, '#');
+                    var guard = new Guard(map);
+                    while (newMap.isWithinBounds(guard.position)) {
+                        if (guard.isStuckInLoop()) {
+                            total++;
+                            break;
+                        }
+                        guard.walk();
+                    }
+                }
+            }
+        }
+
+        return total;
     }
 
     @Override
@@ -88,6 +119,42 @@ public class Day6 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart2Examples() {
-        return Stream.empty();
+        return Stream.of(Arguments.of("""
+                ....#.....
+                .........#
+                ..........
+                ..#.......
+                .......#..
+                ..........
+                .#..^.....
+                ........#.
+                #.........
+                ......#...
+                """, 6L));
+    }
+
+    @Test
+    public void testLoop() {
+        var map = new Grid(Arrays.stream("""
+                ....#.....
+                .........#
+                ..........
+                ..#.......
+                .......#..
+                ..........
+                .#..^.....
+                ........#.
+                #.........
+                ......##..
+                """.split(System.lineSeparator())).toList());
+
+        var guard = new Guard(map);
+        while (map.isWithinBounds(guard.position)) {
+            if (guard.isStuckInLoop()) {
+                var thing = "banana";
+                break;
+            }
+            guard.walk();
+        }
     }
 }

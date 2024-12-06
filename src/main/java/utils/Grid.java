@@ -34,6 +34,15 @@ public class Grid {
         }
     }
 
+    public Grid(Grid other) {
+        grid = new Character[other.getRows()][other.getColumns()];
+        for (int i = 0; i < other.getRows(); i++) {
+            for (int j = 0; j < other.getColumns(); j++) {
+                grid[i][j] = other.get(i, j);
+            }
+        }
+    }
+
     /**
      * Get the character at the specified coordinates.
      *
