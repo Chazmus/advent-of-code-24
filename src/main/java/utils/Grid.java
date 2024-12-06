@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents a grid of characters. The grid is zero-indexed, with the top-left corner being (0, 0).
@@ -51,7 +52,7 @@ public class Grid {
      * @return The character at the specified coordinates.
      */
     public Character get(Vector2 coordinate) {
-        return get(coordinate.x(), coordinate.y());
+        return get(coordinate.y(), coordinate.x());
     }
 
     /**
@@ -101,7 +102,7 @@ public class Grid {
      * @return True if the coordinates are out of bounds, otherwise false.
      */
     public boolean isOutOfBounds(int x, int y) {
-        return x < 0 || x >= getRows() || y < 0 || y >= getColumns();
+        return x < 0 || x >= getColumns() || y < 0 || y >= getRows();
     }
 
     /**
@@ -133,5 +134,16 @@ public class Grid {
      */
     public boolean isWithinBounds(Vector2 coordinate) {
         return isWithinBounds(coordinate.x(), coordinate.y());
+    }
+
+    public Optional<Vector2> find(Character c) {
+        for (int i = 0; i < getRows(); i++) {
+            for (int j = 0; j < getColumns(); j++) {
+                if (get(i, j) == c) {
+                    return Optional.of(new Vector2(j, i));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
