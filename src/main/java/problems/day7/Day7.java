@@ -6,20 +6,17 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 
 public class Day7 extends ProblemBase {
 
-    enum Operator implements BiFunction<Long, Long, Long> {
+    private enum Operator implements BiFunction<Long, Long, Long> {
 
         ADD(Long::sum),
         MULTIPLY((a, b) -> a * b),
-        CONCAT((a, b) -> Long.valueOf(String.valueOf(a) + b)),
-        ;
+        CONCAT((a, b) -> Long.valueOf("%d%d".formatted(a, b)));
 
         private final BiFunction<Long, Long, Long> function;
 
@@ -36,20 +33,6 @@ public class Day7 extends ProblemBase {
     @Override
     public Long solvePart1(List<String> inputArray) {
         return solve(inputArray, List.of(Operator.ADD, Operator.MULTIPLY));
-    }
-
-    @Test
-    public void test1() {
-        var input = getInput();
-        var solution = solvePart1(input);
-        Assertions.assertEquals(5540634308362L, solution);
-    }
-
-    @Test
-    public void test2() {
-        var input = getInput();
-        var solution = solvePart2(input);
-        Assertions.assertEquals(472290821152397L, solution);
     }
 
     @Override
@@ -73,11 +56,14 @@ public class Day7 extends ProblemBase {
     }
 
     private Long getAnyResult(Long testValue, List<Long> equationNumbers,
-            List<List<BiFunction<Long, Long, Long>>> testCases) {
+            List<List<Operator>> testCases) {
         for (var testCase : testCases) {
             Long result = equationNumbers.getFirst();
             for (int i = 0; i < testCase.size(); i++) {
                 result = testCase.get(i).apply(result, equationNumbers.get(i + 1));
+                if (result > testValue) {
+                    break;
+                }
             }
 
             if (result.equals(testValue)) {
@@ -87,11 +73,11 @@ public class Day7 extends ProblemBase {
         return 0L;
     }
 
-    public static <E extends Enum<E> & BiFunction<Long, Long, Long>> List<List<BiFunction<Long, Long, Long>>> generateCombinations(int length, List<Operator> operators) {
+    private static List<List<Operator>> generateCombinations(int length, List<Operator> operators) {
         int numCombinations = (int) Math.pow(operators.size(), length);
-        List<List<BiFunction<Long, Long, Long>>> combinations = new ArrayList<>();
+        List<List<Operator>> combinations = new ArrayList<>();
         for (int combinationIndex = 0; combinationIndex < numCombinations; combinationIndex++) {
-            List<BiFunction<Long, Long, Long>> combination = new ArrayList<>();
+            List<Operator> combination = new ArrayList<>();
             int remainingIndex = combinationIndex;
             for (int position = 0; position < length; position++) {
                 Operator operator = operators.get(remainingIndex % operators.size());
