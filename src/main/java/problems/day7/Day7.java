@@ -90,23 +90,21 @@ public class Day7 extends ProblemBase {
         return 0L;
     }
 
-
-    public static <E extends Enum<E> & BiFunction<Long, Long, Long>> List<List<BiFunction<Long, Long,
-            Long>>> generateCombinations(int length,
-            Class<E> operatorsEnum) {
-        List<List<BiFunction<Long, Long, Long>>> result = new ArrayList<>();
-        E[] values = operatorsEnum.getEnumConstants();
-        int totalCombinations = (int) Math.pow(values.length, length);
-        for (int i = 0; i < totalCombinations; i++) {
+    public static <E extends Enum<E> & BiFunction<Long, Long, Long>> List<List<BiFunction<Long, Long, Long>>> generateCombinations(int length, Class<E> operatorsEnum) {
+        E[] operators = operatorsEnum.getEnumConstants();
+        int numCombinations = (int) Math.pow(operators.length, length);
+        List<List<BiFunction<Long, Long, Long>>> combinations = new ArrayList<>();
+        for (int combinationIndex = 0; combinationIndex < numCombinations; combinationIndex++) {
             List<BiFunction<Long, Long, Long>> combination = new ArrayList<>();
-            int temp = i;
-            for (int j = 0; j < length; j++) {
-                combination.add(values[temp % values.length]);
-                temp /= values.length;
+            int remainingIndex = combinationIndex;
+            for (int position = 0; position < length; position++) {
+                E operator = operators[remainingIndex % operators.length];
+                combination.add(operator);
+                remainingIndex /= operators.length;
             }
-            result.add(combination);
+            combinations.add(combination);
         }
-        return result;
+        return combinations;
     }
 
     @Override
