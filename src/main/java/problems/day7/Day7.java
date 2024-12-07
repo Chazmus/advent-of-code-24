@@ -34,7 +34,7 @@ public class Day7 extends ProblemBase {
 
         ADD(Long::sum),
         MULTIPLY((a, b) -> a * b),
-        CONCAT((a, b) -> Long.valueOf(a + String.valueOf(b))),
+        CONCAT((a, b) -> Long.valueOf(String.valueOf(a) + b)),
         ;
 
         private final BiFunction<Long, Long, Long> function;
@@ -51,39 +51,32 @@ public class Day7 extends ProblemBase {
 
     @Override
     public Long solvePart1(List<String> inputArray) {
-        var total = 0L;
-        for (var line : inputArray) {
-            var parts = line.split(": ");
-            var testValue = Long.valueOf(parts[0]);
-            var equationNumbers = Arrays.stream(parts[1].split(" ")).map(Long::valueOf).toList();
-            var testCases = generateCombinations(equationNumbers.size() - 1, Part1Operators.class);
-            long result = getAnyResult(testValue, equationNumbers, testCases);
-            if (result != 0) {
-                total += result;
-            }
-        }
-
-        return total;
+        return solve(inputArray, Part1Operators.class);
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
+        return solve(inputArray, Part2Operators.class);
+    }
+
+    private <E extends Enum<E> & BiFunction<Long, Long, Long>> Long solve(List<String> inputArray,
+            Class<E> operatorClass) {
         var total = 0L;
         for (var line : inputArray) {
             var parts = line.split(": ");
             var testValue = Long.valueOf(parts[0]);
             var equationNumbers = Arrays.stream(parts[1].split(" ")).map(Long::valueOf).toList();
-            var testCases = generateCombinations(equationNumbers.size() - 1, Part2Operators.class);
+            var testCases = generateCombinations(equationNumbers.size() - 1, operatorClass);
             long result = getAnyResult(testValue, equationNumbers, testCases);
             if (result != 0) {
                 total += result;
             }
         }
-
         return total;
     }
 
-    private Long getAnyResult(Long testValue, List<Long> equationNumbers, List<List<BiFunction<Long, Long, Long>>> testCases) {
+    private Long getAnyResult(Long testValue, List<Long> equationNumbers,
+            List<List<BiFunction<Long, Long, Long>>> testCases) {
         for (var testCase : testCases) {
             Long result = equationNumbers.getFirst();
             for (int i = 0; i < testCase.size(); i++) {
