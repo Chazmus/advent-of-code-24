@@ -69,7 +69,7 @@ public abstract class ProblemBase {
         System.out.println(solution);
     }
 
-    private List<String> getInput() {
+    protected List<String> getInput() {
         var day = getClass().getSimpleName();
         try {
             // load a file from resources folder
