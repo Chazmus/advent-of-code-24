@@ -52,4 +52,8 @@ public record Vector2(int x, int y) {
     public int manhattanDistance() {
         return Math.abs(x) + Math.abs(y);
     }
+
+    public Vector2 subtract(Vector2 other) {
+        return new Vector2(x - other.x, y - other.y);
+    }
 }

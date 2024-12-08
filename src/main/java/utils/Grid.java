@@ -2,6 +2,7 @@ package utils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Represents a grid of characters. The grid is zero-indexed, with the top-left corner being (0, 0).
@@ -154,5 +155,14 @@ public class Grid {
             }
         }
         return Optional.empty();
+    }
+
+    public Stream<Cell> getStreamOfCells() {
+        return Stream.iterate(0, i -> i < getColumns(), i -> i + 1)
+                .flatMap(i -> Stream.iterate(0, j -> j < getRows(), j -> j + 1)
+                        .map(j -> new Cell(new Vector2(j, i), get(i, j))));
+    }
+
+    public record Cell(Vector2 position, Character value) {
     }
 }
