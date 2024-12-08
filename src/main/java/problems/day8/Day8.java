@@ -54,6 +54,20 @@ public class Day8 extends ProblemBase {
         return (long) antinodesSet.size();
     }
 
+    public void calculateAntinodes(Vector2 a, Vector2 b, Grid grid, HashSet<Vector2> antinodesSet) {
+        Vector2 directionBetween = b.subtract(a);
+        Vector2 antinode1 = b.add(directionBetween);
+        Vector2 antinode2 = a.subtract(directionBetween);
+        while (grid.isWithinBounds(antinode1)) {
+            antinodesSet.add(antinode1);
+            antinode1 = antinode1.add(directionBetween);
+        }
+        while (grid.isWithinBounds(antinode2)) {
+            antinodesSet.add(antinode2);
+            antinode2 = antinode2.subtract(directionBetween);
+        }
+    }
+
     public Pair calculateAntinodes(Vector2 a, Vector2 b) {
         Vector2 directionBetween = b.subtract(a);
         Vector2 antinode1 = b.add(directionBetween);
@@ -63,7 +77,31 @@ public class Day8 extends ProblemBase {
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        return 0L;
+        var grid = new Grid(inputArray);
+        var nonEmptyCells = grid.getStreamOfCells()
+                .filter(cell -> cell.value() != '.').toList();
+
+        Map<Character, List<Vector2>> cellsToListOfPositions = new HashMap<>();
+        for (var cell : nonEmptyCells) {
+            cellsToListOfPositions.putIfAbsent(cell.value(), List.of());
+            cellsToListOfPositions.put(cell.value(), Stream.concat(cellsToListOfPositions.get(cell.value()).stream(),
+                    Stream.of(cell.position())).toList());
+        }
+
+        var antinodesSet = new HashSet<Vector2>();
+        for (var entry : cellsToListOfPositions.entrySet()) {
+            entry.getValue().forEach(positionA -> {
+                entry.getValue().forEach(positionB -> {
+                    if (positionA.equals(positionB)) {
+                        antinodesSet.add(positionA);
+                        return;
+                    }
+                    calculateAntinodes(positionA, positionB, grid, antinodesSet);
+                });
+            });
+        }
+
+        return (long) antinodesSet.size();
     }
 
     @Override
@@ -86,7 +124,20 @@ public class Day8 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart2Examples() {
-        return Stream.empty();
+        return Stream.of(Arguments.of("""
+                ............
+                ........0...
+                .....0......
+                .......0....
+                ....0.......
+                ......A.....
+                ............
+                ............
+                ........A...
+                .........A..
+                ............
+                ............
+                """, 34L));
     }
 
     record Pair(Vector2 a, Vector2 b) {
