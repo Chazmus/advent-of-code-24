@@ -2,13 +2,9 @@ package problems.day9;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,11 +14,9 @@ import problems.ProblemBase;
 public class Day9 extends ProblemBase {
     @Override
     public Long solvePart1(List<String> inputArray) {
-//        var uncompressed = getUncompressed(inputArray);
-//        var compacted = compact(uncompressed);
-//
-//        return getTotal(compacted);
-        return 0L;
+        var uncompressed = getUncompressed(inputArray);
+        var compacted = compact(uncompressed);
+        return getTotal(compacted);
     }
 
     @Override
