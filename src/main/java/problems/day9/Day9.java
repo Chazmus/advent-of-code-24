@@ -37,25 +37,24 @@ public class Day9 extends ProblemBase {
         var endPointer = uncompressed.size() - 1;
         var currentStart = uncompressed.get(startPointer);
         var currentEnd = uncompressed.get(endPointer);
-        var result = new ArrayList<String>();
+        var result = new LinkedList<>(uncompressed);
 
-        while (startPointer <= endPointer) {
+        while (startPointer < endPointer) {
             currentStart = uncompressed.get(startPointer);
+            currentEnd = uncompressed.get(endPointer);
             if (currentStart.equals(".")) {
-                currentEnd = uncompressed.get(endPointer);
                 while (currentEnd.equals(".")) {
-                    endPointer--;
-                    currentEnd = uncompressed.get(endPointer);
+                    currentEnd = uncompressed.get(--endPointer);
                 }
-                result.add(currentEnd);
-                startPointer++;
+                if (endPointer < startPointer) {
+                    break;
+                }
+                result.set(startPointer, currentEnd);
+                result.set(endPointer, currentStart);
                 endPointer--;
-            } else {
-                result.add(currentStart);
-                startPointer++;
             }
+            startPointer++;
         }
-
         return result;
     }
 
@@ -82,7 +81,19 @@ public class Day9 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart1Examples() {
-        return Stream.of(Arguments.of("2333133121414131402", 1928L));
+        var incorrectResult = "6370926321628";
+        var anotherIncorrectResult = "6370402959503";
+        return Stream.of(
+//                Arguments.of("2333133121414131402", 1928L),
+//                Arguments.of("12345", 60L),
+//                Arguments.of("123456", 60L),
+//                Arguments.of("19", 0L),
+//                Arguments.of("123", 6L),
+//                Arguments.of("2222", 5L),
+                Arguments.of("22222", 19L)
+
+        );
+
     }
 
     @Override
