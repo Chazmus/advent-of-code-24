@@ -7,6 +7,7 @@
  */
 package problems.day9;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -43,26 +44,26 @@ public class Day9 extends ProblemBase {
         var endPointer = uncompressed.size() - 1;
         var currentStart = uncompressed.get(startPointer);
         var currentEnd = uncompressed.get(endPointer);
+        var result = new ArrayList<String>();
 
         while (startPointer <= endPointer) {
+            currentStart = uncompressed.get(startPointer);
             if (currentStart.equals(".")) {
+                currentEnd = uncompressed.get(endPointer);
                 while (currentEnd.equals(".")) {
                     endPointer--;
                     currentEnd = uncompressed.get(endPointer);
                 }
-                uncompressed.set(startPointer, currentEnd);
-                uncompressed.set(endPointer, ".");
+                result.add(currentEnd);
                 startPointer++;
-                currentStart = uncompressed.get(startPointer);
                 endPointer--;
-                currentEnd = uncompressed.get(endPointer);
             } else {
+                result.add(currentStart);
                 startPointer++;
-                currentStart = uncompressed.get(startPointer);
             }
         }
 
-        return uncompressed;
+        return result;
     }
 
     private LinkedList<String> getUncompressed(List<String> inputArray) {
