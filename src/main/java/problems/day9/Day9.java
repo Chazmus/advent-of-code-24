@@ -32,7 +32,7 @@ public class Day9 extends ProblemBase {
         return total;
     }
 
-    private List<String> compact(LinkedList<String> uncompressed) {
+    private List<String> compact(List<String> uncompressed) {
         var startPointer = 0;
         var endPointer = uncompressed.size() - 1;
         var currentStart = uncompressed.get(startPointer);
@@ -59,9 +59,9 @@ public class Day9 extends ProblemBase {
         return result;
     }
 
-    private LinkedList<String> getUncompressed(List<String> inputArray) {
+    private List<String> getUncompressed(List<String> inputArray) {
         var compressed = Arrays.stream(inputArray.get(0).split("")).map(Short::valueOf).toList();
-        var uncompressed = new LinkedList<String>();
+        var uncompressed = new ArrayList<String>();
         var fileId = 0;
         for (int index = 0; index < compressed.size(); index++) {
             var current = compressed.get(index);
