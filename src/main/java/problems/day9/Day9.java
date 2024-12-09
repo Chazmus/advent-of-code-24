@@ -67,7 +67,6 @@ public class Day9 extends ProblemBase {
     }
 
     private LinkedList<String> getUncompressed(List<String> inputArray) {
-        // Stream the characters in the input
         var compressed = Arrays.stream(inputArray.get(0).split("")).map(Short::valueOf).toList();
         var uncompressed = new LinkedList<String>();
         var fileId = 0;
