@@ -81,15 +81,13 @@ public class Day9 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart1Examples() {
-        var incorrectResult = "6370926321628";
-        var anotherIncorrectResult = "6370402959503";
         return Stream.of(
-//                Arguments.of("2333133121414131402", 1928L),
-//                Arguments.of("12345", 60L),
-//                Arguments.of("123456", 60L),
-//                Arguments.of("19", 0L),
-//                Arguments.of("123", 6L),
-//                Arguments.of("2222", 5L),
+                Arguments.of("2333133121414131402", 1928L),
+                Arguments.of("12345", 60L),
+                Arguments.of("123456", 60L),
+                Arguments.of("19", 0L),
+                Arguments.of("123", 6L),
+                Arguments.of("2222", 5L),
                 Arguments.of("22222", 19L)
 
         );
