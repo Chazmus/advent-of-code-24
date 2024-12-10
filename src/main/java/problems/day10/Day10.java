@@ -16,21 +16,32 @@ import utils.Vector2;
 
 public class Day10 extends ProblemBase {
 
-    record HotSteppa2(Grid.Cell currentCell, Grid grid, Map<Vector2, Integer> score, Vector2 startingPosition) {
-        public void step() {
-            if (currentCell.value() == '9') {
-                if (!score.containsKey(startingPosition)) {
-                    score.put(startingPosition, 1);
-                } else {
-                    score.put(startingPosition, score.get(startingPosition) + 1);
-                }
-                return;
-            }
-            grid.getCardinalNeighbors(currentCell())
-                    .filter(neighbor -> neighbor.value() != '.')
-                    .filter(neighbor -> Character.getNumericValue(neighbor.value()) == Character.getNumericValue(currentCell.value()) + 1)
-                    .forEach(neighbor -> new HotSteppa2(neighbor, grid, score, startingPosition).step());
-        }
+    @Override
+    public Long solvePart1(List<String> inputArray) {
+        var grid = new Grid(inputArray);
+        var cells = grid.findAll('0');
+        var scoreMap = new HashMap<Vector2, Set<Vector2>>();
+        cells.forEach(cell ->
+                new HotSteppa1(cell, grid, scoreMap, cell.position()).step());
+
+        AtomicLong total = new AtomicLong(0);
+        scoreMap.entrySet().stream().forEach(vector2SetEntry -> {
+            total.addAndGet(vector2SetEntry.getValue().size());
+        });
+        return total.get();
+    }
+
+    @Override
+    public Long solvePart2(List<String> inputArray) {
+        var grid = new Grid(inputArray);
+        var cells = grid.findAll('0');
+        var scoreMap = new HashMap<Vector2, Integer>();
+        cells.forEach(cell ->
+                new HotSteppa2(cell, grid, scoreMap, cell.position()).step());
+
+        return scoreMap.values().stream()
+                .map(Long::valueOf)
+                .reduce(0L, Long::sum);
     }
 
     record HotSteppa1(Grid.Cell currentCell, Grid grid, Map<Vector2, Set<Vector2>> score, Vector2 startingPosition) {
@@ -49,32 +60,21 @@ public class Day10 extends ProblemBase {
         }
     }
 
-    @Override
-    public Long solvePart2(List<String> inputArray) {
-        var grid = new Grid(inputArray);
-        var cells = grid.findAll('0');
-        var scoreMap = new HashMap<Vector2, Integer>();
-        cells.forEach(cell ->
-                new HotSteppa2(cell, grid, scoreMap, cell.position()).step());
-
-        return scoreMap.values().stream()
-                .map(Long::valueOf)
-                .reduce(0L, Long::sum);
-    }
-
-    @Override
-    public Long solvePart1(List<String> inputArray) {
-        var grid = new Grid(inputArray);
-        var cells = grid.findAll('0');
-        var scoreMap = new HashMap<Vector2, Set<Vector2>>();
-        cells.forEach(cell ->
-                new HotSteppa1(cell, grid, scoreMap, cell.position()).step());
-
-        AtomicLong total = new AtomicLong(0);
-        scoreMap.entrySet().stream().forEach(vector2SetEntry -> {
-            total.addAndGet(vector2SetEntry.getValue().size());
-        });
-        return total.get();
+    record HotSteppa2(Grid.Cell currentCell, Grid grid, Map<Vector2, Integer> score, Vector2 startingPosition) {
+        public void step() {
+            if (currentCell.value() == '9') {
+                if (!score.containsKey(startingPosition)) {
+                    score.put(startingPosition, 1);
+                } else {
+                    score.put(startingPosition, score.get(startingPosition) + 1);
+                }
+                return;
+            }
+            grid.getCardinalNeighbors(currentCell())
+                    .filter(neighbor -> neighbor.value() != '.')
+                    .filter(neighbor -> Character.getNumericValue(neighbor.value()) == Character.getNumericValue(currentCell.value()) + 1)
+                    .forEach(neighbor -> new HotSteppa2(neighbor, grid, score, startingPosition).step());
+        }
     }
 
     @Override
