@@ -27,7 +27,7 @@ public class Day6 extends ProblemBase {
 
         public Guard(Grid map) {
             visited = new HashSet<>();
-            map.find('^').ifPresent(position -> {
+            map.findAny('^').ifPresent(position -> {
                 this.position = position;
                 this.direction = Direction.UP;
                 this.visited.add(new GuardState(position, direction));

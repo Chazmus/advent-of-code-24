@@ -1,6 +1,5 @@
 package utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -147,7 +146,14 @@ public class Grid {
         return isWithinBounds(coordinate.x(), coordinate.y());
     }
 
-    public Optional<Vector2> find(Character c) {
+    /**
+     * Find any occurrence of the specified character in the grid.
+     *
+     * @param c The character to find.
+     * @return The coordinates of the first occurrence of the character, or an empty optional if the character is not
+     * found.
+     */
+    public Optional<Vector2> findAny(Character c) {
         for (int i = 0; i < getRows(); i++) {
             for (int j = 0; j < getColumns(); j++) {
                 if (get(i, j) == c) {
@@ -158,16 +164,33 @@ public class Grid {
         return Optional.empty();
     }
 
+    /**
+     * Find all occurrences of the specified character in the grid.
+     *
+     * @param c The character to find.
+     * @return A stream of the coordinates of all occurrences of the character.
+     */
+    public Stream<Cell> findAll(Character c) {
+        return getStreamOfCells().filter(cell -> cell.value() == c);
+    }
+
+    /**
+     * Get a stream of all cells in the grid.
+     *
+     * @return A stream of all cells in the grid.
+     */
     public Stream<Cell> getStreamOfCells() {
         return Stream.iterate(0, i -> i < getColumns(), i -> i + 1)
                 .flatMap(i -> Stream.iterate(0, j -> j < getRows(), j -> j + 1)
                         .map(j -> new Cell(new Vector2(j, i), get(i, j))));
     }
 
-    public Stream<Cell> findAll(Character c) {
-        return getStreamOfCells().filter(cell -> cell.value() == c);
-    }
-
+    /**
+     * Get the cardinal neighbors of the specified cell.
+     *
+     * @param target The target cell.
+     * @return A stream of the cardinal neighbors
+     */
     public Stream<Cell> getCardinalNeighbors(Cell target) {
         return Direction.getCardinalDirections()
                 .map(d -> target.position().add(d.toVector()))
