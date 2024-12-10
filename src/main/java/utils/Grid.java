@@ -169,12 +169,8 @@ public class Grid {
     }
 
     public Stream<Cell> getCardinalNeighbors(Cell target) {
-        var neighborPositions = new ArrayList<Vector2>();
-        neighborPositions.add(target.position().add(Direction.UP.toVector()));
-        neighborPositions.add(target.position().add(Direction.DOWN.toVector()));
-        neighborPositions.add(target.position().add(Direction.LEFT.toVector()));
-        neighborPositions.add(target.position().add(Direction.RIGHT.toVector()));
-        return neighborPositions.stream()
+        return Direction.getCardinalDirections()
+                .map(d -> target.position().add(d.toVector()))
                 .filter(this::isWithinBounds)
                 .map(this::getCell);
     }

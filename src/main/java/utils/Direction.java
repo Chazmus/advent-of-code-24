@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.stream.Stream;
+
 public enum Direction {
     UP,
     DOWN,
@@ -9,6 +11,10 @@ public enum Direction {
     UP_RIGHT,
     DOWN_LEFT,
     DOWN_RIGHT;
+
+    public static Stream<Direction> getCardinalDirections() {
+        return Stream.of(UP, DOWN, LEFT, RIGHT);
+    }
 
     public Vector2 toVector() {
         return switch (this) {
