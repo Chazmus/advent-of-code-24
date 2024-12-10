@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -161,6 +162,25 @@ public class Grid {
         return Stream.iterate(0, i -> i < getColumns(), i -> i + 1)
                 .flatMap(i -> Stream.iterate(0, j -> j < getRows(), j -> j + 1)
                         .map(j -> new Cell(new Vector2(j, i), get(i, j))));
+    }
+
+    public Stream<Cell> findAll(Character c) {
+        return getStreamOfCells().filter(cell -> cell.value() == c);
+    }
+
+    public Stream<Cell> getCardinalNeighbors(Cell target) {
+        var neighborPositions = new ArrayList<Vector2>();
+        neighborPositions.add(target.position().add(Direction.UP.toVector()));
+        neighborPositions.add(target.position().add(Direction.DOWN.toVector()));
+        neighborPositions.add(target.position().add(Direction.LEFT.toVector()));
+        neighborPositions.add(target.position().add(Direction.RIGHT.toVector()));
+        return neighborPositions.stream()
+                .filter(this::isWithinBounds)
+                .map(this::getCell);
+    }
+
+    private Cell getCell(Vector2 position) {
+        return new Cell(position, get(position));
     }
 
     public record Cell(Vector2 position, Character value) {
