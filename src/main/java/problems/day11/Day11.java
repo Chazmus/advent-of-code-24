@@ -21,7 +21,7 @@ public class Day11 extends ProblemBase {
     public void setup() {
         stoneToCount = new HashMap<>();
         nextStoneToCount = new HashMap<>();
-       cache = new HashMap<>();
+        cache = new HashMap<>();
     }
 
     @Override
