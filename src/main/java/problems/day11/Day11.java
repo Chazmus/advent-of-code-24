@@ -1,19 +1,28 @@
 package problems.day11;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 
 public class Day11 extends ProblemBase {
 
-    Map<Integer, Integer> iterationToCountOfZeros = new HashMap<>();
+    Map<Long, Long> stoneToCount;
+    Map<Long, Long> nextStoneToCount;
+    Map<Long, Long[]> cache;
+
+    @BeforeEach
+    public void setup() {
+        stoneToCount = new HashMap<>();
+        nextStoneToCount = new HashMap<>();
+       cache = new HashMap<>();
+    }
 
     @Override
     public Long solvePart1(List<String> inputArray) {
@@ -26,42 +35,45 @@ public class Day11 extends ProblemBase {
     }
 
     public Long solve(List<String> inputArray, int iterations) {
-        var input = Arrays.stream(inputArray.get(0).split(" ")).toList();
-        for (int i = 0; i < iterations; i++) {
-            input = blink(input, i);
+        var input = Arrays.stream(inputArray.get(0).split(" "))
+                .map(Long::parseLong).toList();
+
+        for (var stone : input) {
+            stoneToCount.put(stone, stoneToCount.getOrDefault(stone, 0L) + 1);
         }
 
-        var finalResult = (long) input.size();
-        // How many extra stones from zeroes
-        for (var entry : iterationToCountOfZeros.entrySet()) {
-            var iteration = entry.getValue();
-            var numberOfZeroes = entry.getKey();
-            var distanceFromEnd = iterations - iteration;
-            var extraStones = (long) Math.floor((double) distanceFromEnd / 3) * numberOfZeroes;
-            finalResult += extraStones;
-        }
+        for (int j = 0; j < iterations; j++) {
+            nextStoneToCount.clear();
 
-        return finalResult;
-    }
-
-    private List<String> blink(List<String> input, int iteration) {
-        var result = new ArrayList<String>();
-        for (int i = 0; i < input.size(); i++) {
-            var current = input.get(i);
-            if (current.equals("0")) {
-//                iterationToCountOfZeros.put(iteration, iterationToCountOfZeros.getOrDefault(iteration, 0) + 1);
-                result.add("1");
-            } else if (current.length() % 2 == 0) {
-                result.add(current.substring(0, current.length() / 2));
-                result.add(
-                        String.valueOf(
-                                Long.parseLong(current.substring(current.length() / 2)
-                                )
-                        )
-                );
-            } else {
-                result.add(String.valueOf(Long.parseLong(current) * 2024L));
+            for (long stone : stoneToCount.keySet()) {
+                if (stone == 0) {
+                    nextStoneToCount.put(1L, nextStoneToCount.getOrDefault(1L, 0L) + stoneToCount.get(stone));
+                } else if (cache.containsKey(stone)) {
+                    for (Long l : cache.get(stone)) {
+                        nextStoneToCount.put(l, nextStoneToCount.getOrDefault(l, 0L) + stoneToCount.get(stone));
+                    }
+                } else {
+                    var digits = String.valueOf(stone);
+                    if (digits.length() % 2 == 0) {
+                        long first = Long.parseLong(digits.substring(0, digits.length() / 2));
+                        long second = Long.parseLong(digits.substring(digits.length() / 2));
+                        nextStoneToCount.put(first, nextStoneToCount.getOrDefault(first, 0L) + stoneToCount.get(stone));
+                        nextStoneToCount.put(second,
+                                nextStoneToCount.getOrDefault(second, 0L) + stoneToCount.get(stone));
+                        cache.put(stone, new Long[]{first, second});
+                    } else {
+                        long num = 2024 * stone;
+                        nextStoneToCount.put(num, nextStoneToCount.getOrDefault(num, 0L) + stoneToCount.get(stone));
+                        cache.put(stone, new Long[]{num});
+                    }
+                }
             }
+            stoneToCount = Map.copyOf(nextStoneToCount);
+        }
+
+        var result = 0L;
+        for (var stone : stoneToCount.keySet()) {
+            result += stoneToCount.get(stone);
         }
         return result;
     }
