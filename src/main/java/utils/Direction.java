@@ -16,6 +16,28 @@ public enum Direction {
         return Stream.of(UP, DOWN, LEFT, RIGHT);
     }
 
+    public static Direction fromVector(Vector2 vector) {
+        if (vector.equals(Vector2.of(0, -1))) {
+            return UP;
+        } else if (vector.equals(Vector2.of(0, 1))) {
+            return DOWN;
+        } else if (vector.equals(Vector2.of(-1, 0))) {
+            return LEFT;
+        } else if (vector.equals(Vector2.of(1, 0))) {
+            return RIGHT;
+        } else if (vector.equals(Vector2.of(-1, -1))) {
+            return UP_LEFT;
+        } else if (vector.equals(Vector2.of(1, -1))) {
+            return UP_RIGHT;
+        } else if (vector.equals(Vector2.of(-1, 1))) {
+            return DOWN_LEFT;
+        } else if (vector.equals(Vector2.of(1, 1))) {
+            return DOWN_RIGHT;
+        } else {
+            throw new IllegalArgumentException("Invalid vector");
+        }
+    }
+
     public Vector2 toVector() {
         return switch (this) {
             case UP -> Vector2.of(0, -1);
