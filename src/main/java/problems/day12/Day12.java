@@ -31,27 +31,37 @@ public class Day12 extends ProblemBase {
 
     @Override
     public Long solvePart1(List<String> inputArray) {
+        calculatePlots(inputArray);
+        return plots.stream().mapToLong(plot -> (long) plot.cells.size() * plot.perimeter).sum();
+    }
+
+    private void calculatePlots(List<String> inputArray) {
         var grid = new Grid(inputArray);
         grid.getStreamOfCells().forEach(cell -> {
             if (visited.contains(cell)) {
                 return;
             }
-            plots.add(new Plot(cell, grid));
+            plots.add(new Plot(cell, grid, visited));
         });
-        return 0L;
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        return 0L;
+        calculatePlots(inputArray);
+        plots.forEach(Plot::calculateStraightLinePerimiters);
+        return null;
     }
 
     static class Plot {
         Set<Grid.Cell> cells = new HashSet<>();
+        Set<Grid.Cell> allVisited;
         int perimeter;
+        int straightPerimeter;
 
-        Plot(Grid.Cell startingCell, Grid grid) {
+        Plot(Grid.Cell startingCell, Grid grid, Set<Grid.Cell> allVisited) {
             cells.add(startingCell);
+            this.allVisited = allVisited;
+            this.allVisited.add(startingCell);
             walkPlot(startingCell, grid);
         }
 
@@ -60,10 +70,11 @@ public class Day12 extends ProblemBase {
                 if (grid.isWithinBounds(neighbourVector)) {
                     var neighbourCell = grid.getCell(neighbourVector);
                     if (neighbourCell.value() == startingCell.value()) {
-                        if (cells.contains(neighbourCell)) {
+                        if (cells.contains(neighbourCell) || allVisited.contains(neighbourCell)) {
                             return;
                         }
                         cells.add(neighbourCell);
+                        allVisited.add(neighbourCell);
                         walkPlot(neighbourCell, grid);
                     } else {
                         // different plot
@@ -77,6 +88,9 @@ public class Day12 extends ProblemBase {
             });
         }
 
+        public void calculateStraightLinePerimiters() {
+
+        }
     }
 
     @Override
@@ -112,6 +126,35 @@ public class Day12 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart2Examples() {
-        return Stream.empty();
+        return Stream.of(
+                Arguments.of("""
+                        AAAA
+                        BBCD
+                        BBCC
+                        EEEC
+                        """, 80L),
+                Arguments.of("""
+                        OOOOO
+                        OXOXO
+                        OOOOO
+                        OXOXO
+                        OOOOO
+                        """, 436L),
+                Arguments.of("""
+                        EEEEE
+                        EXXXX
+                        EEEEE
+                        EXXXX
+                        EEEEE
+                        """, 204L),
+                Arguments.of("""
+                        AAAAAA
+                        AAABBA
+                        AAABBA
+                        ABBAAA
+                        ABBAAA
+                        AAAAAA
+                        """, 368L)
+        );
     }
 }
