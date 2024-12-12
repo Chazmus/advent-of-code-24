@@ -9,6 +9,7 @@ package problems.day12;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -94,24 +95,21 @@ public class Day12 extends ProblemBase {
         }
 
         public void calculateStraightLinePerimeters() {
-            cells.forEach(cell -> {
-                cell.position().getCardinalNeighbours().forEach(neighbourVector -> {
-                    if (cells.stream().map(Grid.Cell::position).anyMatch(v -> v.equals(neighbourVector))) {
-                        return;
-                    }
-                    // At a perimeter
-                    perimeterEdges.add(new PerimeterEdge(cell.position(),
-                            Direction.fromVector(neighbourVector.subtract(cell.position()))));
-                });
-            });
+            cells.forEach(cell -> cell.position().getCardinalNeighbours().forEach(neighbourVector -> {
+                if (cells.stream().map(Grid.Cell::position).anyMatch(v -> v.equals(neighbourVector))) {
+                    return;
+                }
+                // At a perimeter
+                perimeterEdges.add(new PerimeterEdge(cell.position(),
+                        Direction.fromVector(neighbourVector.subtract(cell.position()))));
+            }));
             Set<Set<PerimeterEdge>> allStraightEdges = new HashSet<>();
             var initializedStraightEdge = new HashSet<PerimeterEdge>();
-            for (var singleEdge : perimeterEdges) {
-                Set<PerimeterEdge> straightEdge = getStraightEdge(singleEdge, initializedStraightEdge, perimeterEdges, allStraightEdges);
-                if (straightEdge != null) {
-                    allStraightEdges.add(straightEdge);
-                }
-            }
+            perimeterEdges.stream()
+                    .map(singleEdge -> getStraightEdge(singleEdge, initializedStraightEdge,
+                            perimeterEdges, allStraightEdges))
+                    .filter(Objects::nonNull)
+                    .forEach(allStraightEdges::add);
             straightPerimeter = allStraightEdges.size();
         }
 
