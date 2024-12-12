@@ -104,60 +104,52 @@ public class Day12 extends ProblemBase {
                             Direction.fromVector(neighbourVector.subtract(cell.position()))));
                 });
             });
-            // Combine edges in a line
-            var singleEdges = new HashSet<Set<PerimeterEdge>>();
-            for (var edge : perimeterEdges) {
-                if (singleEdges.stream().anyMatch(set -> set.contains(edge))) {
-                    continue;
-                }
-                var edgeSet = new HashSet<PerimeterEdge>();
-                edgeSet.add(edge);
-                var direction = edge.direction;
-                var found = false;
-                switch (direction) {
-                    case UP, DOWN -> {
-                        var possibleNeighbor1 = new PerimeterEdge(edge.location().add(Direction.LEFT.toVector()),
-                                direction);
-                        var possibleNeighbor2 = new PerimeterEdge(edge.location().add(Direction.RIGHT.toVector()),
-                                direction);
-
-                        for (var singleEdgeSet : singleEdges) {
-                            if (singleEdgeSet.contains(possibleNeighbor1) || singleEdgeSet.contains(possibleNeighbor2)) {
-                                singleEdgeSet.add(edge);
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found) {
-                            break;
-                        }
-
-                        if (perimeterEdges.contains(possibleNeighbor1)) {
-                            edgeSet.add(possibleNeighbor1);
-                        }
-                        if (perimeterEdges.contains(possibleNeighbor2)) {
-                            edgeSet.add(possibleNeighbor2);
-                        }
-                    }
-                    case LEFT, RIGHT -> {
-                        var possibleNeighbor1 = new PerimeterEdge(edge.location().add(Direction.UP.toVector()),
-                                direction);
-                        var possibleNeighbor2 = new PerimeterEdge(edge.location().add(Direction.DOWN.toVector()),
-                                direction);
-                        if (perimeterEdges.contains(possibleNeighbor1)) {
-                            edgeSet.add(possibleNeighbor1);
-                        }
-                        if (perimeterEdges.contains(possibleNeighbor2)) {
-                            edgeSet.add(possibleNeighbor2);
-                        }
-                    }
-                }
-                if (!found) {
-                    singleEdges.add(edgeSet);
+            Set<Set<PerimeterEdge>> allStraightEdges = new HashSet<>();
+            var initializedStraightEdge = new HashSet<PerimeterEdge>();
+            for (var singleEdge : perimeterEdges) {
+                Set<PerimeterEdge> straightEdge = getStraightEdge(singleEdge, initializedStraightEdge, perimeterEdges, allStraightEdges);
+                if (straightEdge != null) {
+                    allStraightEdges.add(straightEdge);
                 }
             }
-            straightPerimeter = singleEdges.size();
+            straightPerimeter = allStraightEdges.size();
         }
+
+        private Set<PerimeterEdge> getStraightEdge(PerimeterEdge singleEdge, HashSet<PerimeterEdge> straightEdge,
+                Set<PerimeterEdge> perimeterEdges, Set<Set<PerimeterEdge>> allStraightEdges) {
+            if (allStraightEdges.stream().anyMatch(set -> set.contains(singleEdge))) {
+                return null;
+            }
+            straightEdge.add(singleEdge);
+            switch (singleEdge.direction()) {
+                case UP, DOWN -> {
+                    var possibleNeighbour1 = new PerimeterEdge(singleEdge.location().add(Direction.LEFT.toVector()),
+                            singleEdge.direction());
+                    var possibleNeighbour2 = new PerimeterEdge(singleEdge.location().add(Direction.RIGHT.toVector()),
+                            singleEdge.direction());
+                    if (perimeterEdges.contains(possibleNeighbour1) && !straightEdge.contains(possibleNeighbour1)) {
+                        getStraightEdge(possibleNeighbour1, straightEdge, perimeterEdges, allStraightEdges);
+                    }
+                    if (perimeterEdges.contains(possibleNeighbour2)) {
+                        getStraightEdge(possibleNeighbour2, straightEdge, perimeterEdges, allStraightEdges);
+                    }
+                }
+                case LEFT, RIGHT -> {
+                    var possibleNeighbour1 = new PerimeterEdge(singleEdge.location().add(Direction.UP.toVector()),
+                            singleEdge.direction());
+                    var possibleNeighbour2 = new PerimeterEdge(singleEdge.location().add(Direction.DOWN.toVector()),
+                            singleEdge.direction());
+                    if (perimeterEdges.contains(possibleNeighbour1) && !straightEdge.contains(possibleNeighbour1)) {
+                        getStraightEdge(possibleNeighbour1, straightEdge, perimeterEdges, allStraightEdges);
+                    }
+                    if (perimeterEdges.contains(possibleNeighbour2) && !straightEdge.contains(possibleNeighbour2)) {
+                        getStraightEdge(possibleNeighbour2, straightEdge, perimeterEdges, allStraightEdges);
+                    }
+                }
+            }
+            return straightEdge;
+        }
+
 
         record PerimeterEdge(Vector2 location, Direction direction) {
         }
@@ -197,12 +189,12 @@ public class Day12 extends ProblemBase {
     @Override
     public Stream<Arguments> getPart2Examples() {
         return Stream.of(
-//                Arguments.of("""
-//                        AAAA
-//                        BBCD
-//                        BBCC
-//                        EEEC
-//                        """, 80L),
+                Arguments.of("""
+                        AAAA
+                        BBCD
+                        BBCC
+                        EEEC
+                        """, 80L),
                 Arguments.of("""
                         OOOOO
                         OXOXO
@@ -236,7 +228,7 @@ public class Day12 extends ProblemBase {
                         MIIIIIJJEE
                         MIIISIJEEE
                         MMMISSJEEE
-                        """, 1930L)
+                        """, 1206L)
         );
     }
 }
