@@ -7,6 +7,8 @@
  */
 package utils;
 
+import java.util.stream.Stream;
+
 /**
  * Represents a 2D vector.
  */
@@ -55,5 +57,14 @@ public record Vector2(int x, int y) {
 
     public Vector2 subtract(Vector2 other) {
         return new Vector2(x - other.x, y - other.y);
+    }
+
+    public Stream<Vector2> getCardinalNeighbours() {
+        return Stream.of(
+                new Vector2(x, y + 1),
+                new Vector2(x, y - 1),
+                new Vector2(x + 1, y),
+                new Vector2(x - 1, y)
+        );
     }
 }

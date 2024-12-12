@@ -198,7 +198,13 @@ public class Grid {
                 .map(this::getCell);
     }
 
-    private Cell getCell(Vector2 position) {
+    /**
+     * Get the cell at the specified position.
+     *
+     * @param position The position.
+     * @return The cell at the specified position.
+     */
+    public Cell getCell(Vector2 position) {
         return new Cell(position, get(position));
     }
 
