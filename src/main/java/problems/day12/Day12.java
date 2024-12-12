@@ -27,7 +27,33 @@ public class Day12 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart1Examples() {
-        return Stream.empty();
+        return Stream.of(
+                Arguments.of("""
+                        AAAA
+                        BBCD
+                        BBCC
+                        EEEC
+                        """, 140L),
+                Arguments.of("""
+                        OOOOO
+                        OXOXO
+                        OOOOO
+                        OXOXO
+                        OOOOO
+                        """, 772L),
+                Arguments.of("""
+                        RRRRIICCFF
+                        RRRRIICCCF
+                        VVRRRCCFFF
+                        VVRCCCJFFF
+                        VVVVCJJCFE
+                        VVIVCCJJEE
+                        VVIIICJJEE
+                        MIIIIIJJEE
+                        MIIISIJEEE
+                        MMMISSJEEE
+                        """, 1930L)
+        );
     }
 
     @Override
