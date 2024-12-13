@@ -15,8 +15,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
 
-import com.google.common.math.LongMath;
-
 import problems.ProblemBase;
 import utils.BigVector2;
 import utils.Vector2;
@@ -80,6 +78,7 @@ public class Day13 extends ProblemBase {
                 b = BigVector2.of(x, y);
             } else if (line.startsWith("Prize")) {
                 prize = BigVector2.of(Long.parseLong(x) + SLIGHT_ERROR, Long.parseLong(y) + SLIGHT_ERROR);
+//                prize = BigVector2.of(Long.parseLong(x), Long.parseLong(y));
             }
         }
 
@@ -87,12 +86,11 @@ public class Day13 extends ProblemBase {
         for (var puzzle : puzzles) {
             var solution = puzzle.findSolution();
             if (solution.isPresent()) {
-                return total + solution.get();
+                total += solution.get();
             }
         }
 
-
-        return 0L;
+        return total;
     }
 
     record Puzzle(Vector2 a, Vector2 b, Vector2 prize) {
@@ -116,17 +114,29 @@ public class Day13 extends ProblemBase {
 
     record BigPuzzle(BigVector2 a, BigVector2 b, BigVector2 prize) {
         Optional<Long> findSolution() {
-            var aX  = prize.x() % a.x();
-            var aY = prize.y() % a.y();
+            var ax = (double) a.x();
+            var ay = (double) a.y();
+            var bx = (double) b.x();
+            var by = (double) b.y();
+            var prizeX = (double) prize.x();
+            var prizeY = (double) prize.y();
 
-            return null;
-        }
+            var bPresses = (prizeY - (ay * prizeX) / ax) / (by - ((ay * bx) / ax));
+            var aPresses = (prizeX - (bPresses * bx)) / ax;
 
-        int priceOfSolution(Vector2 vector) {
-            return vector.x() * 3 + vector.y();
+            long aPressesLong = Math.round(aPresses);
+            long bPressesLong = Math.round(bPresses);
+
+            var testx = aPressesLong * a.x() + bPressesLong * b.x();
+            var testy = aPressesLong * a.y() + bPressesLong * b.y();
+
+            if(testx == prize.x() && testy == prize.y()) {
+                return Optional.of(aPressesLong * 3 + bPressesLong);
+            }
+
+            return Optional.empty();
         }
     }
-
 
     @Override
     public Stream<Arguments> getPart1Examples() {

@@ -22,11 +22,11 @@ public record BigVector2(long x, long y) {
         return new BigVector2(Long.parseLong(x), Long.parseLong(y));
     }
 
-    public BigVector2 setX(int x) {
+    public BigVector2 setX(long x) {
         return new BigVector2(x, y);
     }
 
-    public BigVector2 setY(int x) {
+    public BigVector2 setY(long x) {
         return new BigVector2(x, y);
     }
 
@@ -34,7 +34,7 @@ public record BigVector2(long x, long y) {
         return new BigVector2(x + other.x, y + other.y);
     }
 
-    public BigVector2 multiply(int scalar) {
+    public BigVector2 multiply(long scalar) {
         return new BigVector2(x * scalar, y * scalar);
     }
 
