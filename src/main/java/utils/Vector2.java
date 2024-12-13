@@ -18,6 +18,12 @@ public record Vector2(int x, int y) {
         return new Vector2(x, y);
     }
 
+    public static Vector2 of(String x, String y) {
+        var xInt = Integer.parseInt(x);
+        var yInt = Integer.parseInt(y);
+        return new Vector2(xInt, yInt);
+    }
+
     public Vector2 setX(int x) {
         return new Vector2(x, y);
     }
