@@ -42,7 +42,7 @@ public class LinearMask {
                             for (var maskCoordinate : maskVectors) {
                                 var x = i + maskCoordinate.x();
                                 var y = j + maskCoordinate.y();
-                                if (grid.isWithinBounds(x, y)) {
+                                if (grid.isWithinBounds(y, x)) {
                                     set.add(grid.get(x, y));
                                 }
                             }
@@ -105,5 +105,8 @@ public class LinearMask {
         var minY = newMask.stream().map(Vector2::y).min(Integer::compareTo).get();
         var normalizedMask = newMask.stream().map(v -> Vector2.of(v.x() - minX, v.y() - minY)).toList();
         return normalizedMask;
+    }
+    public List<Vector2> getMaskVectors() {
+        return maskVectors;
     }
 }

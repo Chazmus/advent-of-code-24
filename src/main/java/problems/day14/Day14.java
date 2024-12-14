@@ -10,6 +10,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
+import utils.Direction;
+import utils.Grid;
+import utils.LinearMask;
 import utils.Vector2;
 
 public class Day14 extends ProblemBase {
@@ -75,33 +78,21 @@ public class Day14 extends ProblemBase {
                             var vy = Integer.parseInt(matcher.group(4));
                             return new Robot(new Vector2(px, py), new Vector2(vx, vy), mapSize);
                         }).toList();
-        IntStream.range(0, 100)
+
+        var linearMask = new LinearMask(Direction.DOWN, 7);
+        IntStream.range(0, 10000)
                 .forEach(i -> {
+                    var grid = new Grid(mapSize.x(), mapSize.y(), '.');
+                    bots.forEach(b -> grid.set(b.getPosition(), '#'));
                     bots.forEach(Robot::move);
+                    if (linearMask.getAllStringsStream(grid, false)
+                            .anyMatch(s -> s.equals("#######"))) {
+                        System.out.print("Step " + (i + 1));
+                        grid.print();
+                    }
                 });
 
-        List<Robot> topLeft = new ArrayList<>();
-        List<Robot> topRight = new ArrayList<>();
-        List<Robot> bottomLeft = new ArrayList<>();
-        List<Robot> bottomRight = new ArrayList<>();
-
-        var horizontalMiddle = (mapSize.x()) / 2;
-        var verticalMiddle = (mapSize.y()) / 2;
-        bots.forEach(b -> {
-            var x = b.getPosition().x();
-            var y = b.getPosition().y();
-            if (x < horizontalMiddle && y < verticalMiddle) {
-                topLeft.add(b);
-            } else if (x > horizontalMiddle && y < verticalMiddle) {
-                topRight.add(b);
-            } else if (x < horizontalMiddle && y > verticalMiddle) {
-                bottomLeft.add(b);
-            } else if (x > horizontalMiddle && y > verticalMiddle) {
-                bottomRight.add(b);
-            }
-        });
-
-        return (long) topLeft.size() * topRight.size() * bottomLeft.size() * bottomRight.size();
+        return 0L;
     }
 
     @Override

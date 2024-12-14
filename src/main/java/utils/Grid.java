@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -20,6 +22,22 @@ public class Grid {
     public Grid(int rows, int columns) {
         grid = new Character[rows][columns];
     }
+
+    /**
+     * Create a new grid with the specified number of rows and columns.
+     *
+     * @param rows    The number of rows in the grid.
+     * @param columns The number of columns in the grid.
+     */
+    public Grid(int rows, int columns, Character fillValue) {
+        grid = new Character[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                grid[i][j] = fillValue;
+            }
+        }
+    }
+
 
     /**
      * Create a new grid from a list of strings.
@@ -206,6 +224,24 @@ public class Grid {
      */
     public Cell getCell(Vector2 position) {
         return new Cell(position, get(position));
+    }
+
+    public void print() {
+        for (int j = 0; j < getColumns(); j++) {
+            for (int i = 0; i < getRows(); i++) {
+                System.out.print(get(i, j));
+            }
+            System.out.println();
+        }
+    }
+
+    public void print(FileWriter writer) throws IOException {
+        for (int j = 0; j < getColumns(); j++) {
+            for (int i = 0; i < getRows(); i++) {
+                writer.write(get(i, j));
+            }
+            writer.write("\n");
+        }
     }
 
     public record Cell(Vector2 position, Character value) {
