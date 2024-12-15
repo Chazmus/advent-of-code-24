@@ -38,6 +38,24 @@ public enum Direction {
         }
     }
 
+    public static Direction from(char instruction) {
+        switch (instruction) {
+            case '^' -> {
+                return UP;
+            }
+            case 'v' -> {
+                return DOWN;
+            }
+            case '<' -> {
+                return LEFT;
+            }
+            case '>' -> {
+                return RIGHT;
+            }
+        }
+        throw new IllegalArgumentException("Invalid instruction");
+    }
+
     public Vector2 toVector() {
         return switch (this) {
             case UP -> Vector2.of(0, -1);

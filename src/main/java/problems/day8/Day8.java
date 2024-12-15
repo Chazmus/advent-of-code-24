@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
 import utils.Grid;
+import utils.Pair;
 import utils.Vector2;
 
 public class Day8 extends ProblemBase {
@@ -41,11 +42,11 @@ public class Day8 extends ProblemBase {
                         return;
                     }
                     var antinodes = calculateAntinodes(positionA, positionB);
-                    if (grid.isWithinBounds(antinodes.a())) {
-                        antinodesSet.add(antinodes.a());
+                    if (grid.isWithinBounds(antinodes.first())) {
+                        antinodesSet.add(antinodes.first());
                     }
-                    if (grid.isWithinBounds(antinodes.b())) {
-                        antinodesSet.add(antinodes.b());
+                    if (grid.isWithinBounds(antinodes.second())) {
+                        antinodesSet.add(antinodes.second());
                     }
                 });
             });
@@ -68,11 +69,11 @@ public class Day8 extends ProblemBase {
         }
     }
 
-    public Pair calculateAntinodes(Vector2 a, Vector2 b) {
+    public Pair<Vector2> calculateAntinodes(Vector2 a, Vector2 b) {
         Vector2 directionBetween = b.subtract(a);
         Vector2 antinode1 = b.add(directionBetween);
         Vector2 antinode2 = a.subtract(directionBetween);
-        return new Pair(antinode1, antinode2);
+        return new Pair<>(antinode1, antinode2);
     }
 
     @Override
@@ -140,6 +141,4 @@ public class Day8 extends ProblemBase {
                 """, 34L));
     }
 
-    record Pair(Vector2 a, Vector2 b) {
-    }
 }
