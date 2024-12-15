@@ -10,14 +10,15 @@ package problems.day15;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
 import problems.ProblemBase;
-import problems.day8.Day8;
 import utils.Direction;
 import utils.Grid;
 import utils.Pair;
@@ -68,13 +69,75 @@ public class Day15 extends ProblemBase {
         var map = input.map();
         var instructions = input.instructionSet();
         processDoubleBig(map);
-//        printMap(new Vector2(map.getRows() * 2, map.getColumns()));
 
         for (var instruction : instructions.toCharArray()) {
+//            printMap(new Vector2(map.getRows() * 2, map.getColumns()));
             var direction = Direction.from(instruction);
-            moveRobot(direction);
+//            System.out.println(direction);
+            moveRobot2(direction);
         }
-        return 0L;
+        return calculateScore2();
+    }
+
+    private Long calculateScore2() {
+        return bigBoxes.stream()
+                .mapToLong(bigBox -> bigBox.position.first().x() + (100L * bigBox.position.first().y()))
+                .sum();
+    }
+
+    private void moveRobot2(Direction direction) {
+        var target = robot.add(direction.toVector());
+        if (walls.contains(target)) {
+            return;
+        }
+
+        var boxesToMove = bigBoxes.stream()
+                .filter(bigBox -> bigBox.position.contains(target))
+                .collect(Collectors.toSet());
+
+        if (boxesToMove.isEmpty()) {
+            robot = target;
+            return;
+        }
+        var targetBox = boxesToMove.iterator().next();
+        var boxCanMove = getBoxCanMove(targetBox, direction, boxesToMove);
+        if (boxCanMove) {
+            boxesToMove.forEach(bigBox -> {
+                bigBox.position = Pair.of(bigBox.position.first().add(direction.toVector()),
+                        bigBox.position.second().add(direction.toVector()));
+            });
+            robot = robot.add(direction.toVector());
+        }
+    }
+
+    private boolean getBoxCanMove(BigBox targetBox, Direction direction, Set<BigBox> boxesToMove) {
+        Vector2 targetTile;
+        Optional<Vector2> targetTile2;
+        if (direction == Direction.RIGHT) {
+            targetTile2 = Optional.empty();
+            targetTile = targetBox.position.second().add(direction.toVector());
+        } else if (direction == Direction.LEFT) {
+            targetTile2 = Optional.empty();
+            targetTile = targetBox.position.first().add(direction.toVector());
+        } else if (direction == Direction.DOWN) {
+            targetTile = targetBox.position.first().add(direction.toVector());
+            targetTile2 = Optional.of(targetBox.position.second().add(direction.toVector()));
+        } else {
+            targetTile = targetBox.position.first().add(direction.toVector());
+            targetTile2 = Optional.of(targetBox.position.second().add(direction.toVector()));
+        }
+
+        if (walls.contains(targetTile) || targetTile2.isPresent() && walls.contains(targetTile2.get())) {
+            return false;
+        }
+
+        return bigBoxes.stream()
+                .filter(bigBox -> bigBox != targetBox && bigBox.position.contains(targetTile) ||
+                        targetTile2.isPresent() && bigBox.position.contains(targetTile2.get()))
+                .allMatch(bigBox -> {
+                    boxesToMove.add(bigBox);
+                    return getBoxCanMove(bigBox, direction, boxesToMove);
+                });
     }
 
     public void printMap(Vector2 size) {
@@ -84,6 +147,7 @@ public class Day15 extends ProblemBase {
             newMap.set(bigBox.position.first(), '[');
             newMap.set(bigBox.position.second(), ']');
         });
+        newMap.set(robot, '@');
         newMap.print();
     }
 
@@ -158,10 +222,6 @@ public class Day15 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart1Examples() {
-        return getArgumentsStream();
-    }
-
-    private static Stream<Arguments> getArgumentsStream() {
         return Stream.of(
                 Arguments.of("""
                         ########
@@ -201,7 +261,30 @@ public class Day15 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart2Examples() {
-        return getArgumentsStream();
+        return Stream.of(
+                Arguments.of("""
+                        ##########
+                        #..O..O.O#
+                        #......O.#
+                        #.OO..O.O#
+                        #..O@..O.#
+                        #O#..O...#
+                        #O..O..O.#
+                        #.OO.O.OO#
+                        #....O...#
+                        ##########
+                        
+                        <vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^
+                        vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
+                        ><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<
+                        <<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^
+                        ^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><
+                        ^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^
+                        >^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^
+                        <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
+                        ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
+                        v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^""", 9021L)
+        );
     }
 
     private record Input(Grid map, String instructionSet) {
