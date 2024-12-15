@@ -71,9 +71,9 @@ public class Day15 extends ProblemBase {
         processDoubleBig(map);
 
         for (var instruction : instructions.toCharArray()) {
-//            printMap(new Vector2(map.getRows() * 2, map.getColumns()));
+            printMap(new Vector2(map.getRows() * 2, map.getColumns()));
             var direction = Direction.from(instruction);
-//            System.out.println(direction);
+            System.out.println(direction);
             moveRobot2(direction);
         }
         return calculateScore2();
