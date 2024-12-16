@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -133,7 +132,7 @@ public class Day16 extends ProblemBase {
         }
     }
 
-    class PositionToScoreRecord extends HashMap<Position, Long> {
+    static class PositionToScoreRecord extends HashMap<Position, Long> {
 
         public void insert(PositionAndScore positionAndScore) {
             var position = positionAndScore.position();
@@ -190,15 +189,6 @@ public class Day16 extends ProblemBase {
     @Override
     public Stream<Arguments> getPart1Examples() {
         return Stream.of(
-//                Arguments.of("""
-//                        ######
-//                        #S..E#
-//                        ######""", 3L),
-//                Arguments.of("""
-//                        ######
-//                        #.####
-//                        #S..E#
-//                        ######""", 3L),
                 Arguments.of("""
                         ######
                         #....#
