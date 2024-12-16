@@ -1,5 +1,6 @@
 package problems.day16;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,43 +26,111 @@ public class Day16 extends ProblemBase {
 
     @Override
     public Long solvePart1(List<String> inputArray) {
-        // Answers attempted: 89460
         grid = new Grid(inputArray);
         var start = grid.findAny('S').get();
         var end = grid.findAny('E').get();
         scoreRecord = new PositionToScoreRecord();
         var startingPosition = new Position(start, Direction.RIGHT);
         var startingPositionAndScore = new PositionAndScore(startingPosition, 0L, scoreRecord);
-
-        insert(startingPositionAndScore, scoreRecord);
-
+        insert(startingPositionAndScore);
         return scoreRecord.entrySet().stream()
                 .filter(entry -> entry.getKey().location().equals(end))
                 .mapToLong(Map.Entry::getValue).min().getAsLong();
     }
 
-    private void insert(PositionAndScore positionAndScore, PositionToScoreRecord positionToScoreRecord) {
+    @Override
+    public Long solvePart2(List<String> inputArray) {
+        grid = new Grid(inputArray);
+        var start = grid.findAny('S').get();
+        var end = grid.findAny('E').get();
+        scoreRecord = new PositionToScoreRecord();
+        var startingPosition = new Position(start, Direction.RIGHT);
+        var startingPositionAndScore = new PositionAndScore(startingPosition, 0L, scoreRecord);
+        var predecessors = new HashMap<Position, Set<Position>>();
+        insertWithPredecessorTracking(startingPositionAndScore, predecessors);
+        Set<List<Position>> allBestPaths = new HashSet<>();
+        Set<Position> endPositions = Set.of(
+                new Position(end, Direction.RIGHT),
+                new Position(end, Direction.DOWN),
+                new Position(end, Direction.UP),
+                new Position(end, Direction.LEFT)
+        );
+
+        for (Position endPosition : endPositions) {
+            List<Position> currentPath = new ArrayList<>();
+            currentPath.add(endPosition);
+            if (scoreRecord.containsKey(endPosition)) {
+                reconstructPaths(endPosition, scoreRecord.get(endPosition), predecessors, currentPath, allBestPaths);
+            }
+        }
+        var entries = allBestPaths.stream().flatMap(List::stream)
+                .map(Position::location)
+                .collect(Collectors.toSet());
+        return (long) entries.size();
+    }
+
+    private void reconstructPaths(Position currentPosition, long currentScore,
+            Map<Position, Set<Position>> predecessors, List<Position> currentPath, Set<List<Position>> allBestPaths) {
+        if (currentPosition == null) {
+            return;
+        }
+
+        if (predecessors.containsKey(currentPosition)) {
+            for (Position predecessor : predecessors.get(currentPosition)) {
+                if (scoreRecord.get(predecessor) == currentScore - 1) {
+                    currentPath.add(0, predecessor);
+                    reconstructPaths(predecessor, currentScore - 1, predecessors, currentPath, allBestPaths);
+                    currentPath.remove(0);
+                } else if (scoreRecord.get(predecessor) == currentScore - 1001) {
+                    currentPath.add(0, predecessor);
+                    reconstructPaths(predecessor, currentScore - 1001, predecessors, currentPath, allBestPaths);
+                    currentPath.remove(0);
+                }
+            }
+        } else {
+            allBestPaths.add(new ArrayList<>(currentPath));
+        }
+    }
+
+    private void insert(PositionAndScore positionAndScore) {
         Queue<PositionAndScore> queue = new PriorityQueue<>(Comparator.comparingLong(PositionAndScore::score));
         queue.add(positionAndScore);
 
         while (!queue.isEmpty()) {
             PositionAndScore current = queue.poll();
-            if (positionToScoreRecord.containsKey(current.position()) && positionToScoreRecord.get(current.position()) <= current.score()) {
+            if (scoreRecord.containsKey(current.position()) && scoreRecord.get(current.position()) <= current.score()) {
                 continue;
             }
-            positionToScoreRecord.insert(current);
+            scoreRecord.insert(current);
 
             for (PositionAndScore newPosAndScore : current.getNext(grid)) {
-                if (!positionToScoreRecord.containsKey(newPosAndScore.position()) || positionToScoreRecord.get(newPosAndScore.position()) > newPosAndScore.score()) {
+                if (!scoreRecord.containsKey(newPosAndScore.position()) || scoreRecord.get(newPosAndScore.position()) > newPosAndScore.score()) {
                     queue.add(newPosAndScore);
                 }
             }
         }
     }
 
-    @Override
-    public Long solvePart2(List<String> inputArray) {
-        return 0L;
+
+    private void insertWithPredecessorTracking(PositionAndScore positionAndScore,
+            Map<Position, Set<Position>> predecessors) {
+        Queue<PositionAndScore> queue = new PriorityQueue<>(Comparator.comparingLong(PositionAndScore::score));
+        queue.add(positionAndScore);
+
+        while (!queue.isEmpty()) {
+            PositionAndScore current = queue.poll();
+            if (scoreRecord.containsKey(current.position()) && scoreRecord.get(current.position()) <= current.score()) {
+                continue;
+            }
+            scoreRecord.insert(current);
+
+            for (PositionAndScore newPosAndScore : current.getNext(grid)) {
+                if (!scoreRecord.containsKey(newPosAndScore.position()) || scoreRecord.get(newPosAndScore.position()) > newPosAndScore.score()) {
+                    queue.add(newPosAndScore);
+                    predecessors.computeIfAbsent(newPosAndScore.position(), k -> new HashSet<>()).add(current.position());
+                }
+            }
+        }
     }
 
     class PositionToScoreRecord extends HashMap<Position, Long> {
