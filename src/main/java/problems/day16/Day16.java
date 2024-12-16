@@ -1,9 +1,13 @@
 package problems.day16;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -20,6 +24,7 @@ public class Day16 extends ProblemBase {
 
     @Override
     public Long solvePart1(List<String> inputArray) {
+        // Answers attempted: 89460
         grid = new Grid(inputArray);
         var start = grid.findAny('S').get();
         var end = grid.findAny('E').get();
@@ -35,9 +40,21 @@ public class Day16 extends ProblemBase {
     }
 
     private void insert(PositionAndScore positionAndScore, PositionToScoreRecord positionToScoreRecord) {
-        positionToScoreRecord.insert(positionAndScore);
-        for (PositionAndScore newPosAndScore : positionAndScore.getNext(grid)) {
-            insert(newPosAndScore, positionToScoreRecord);
+        Queue<PositionAndScore> queue = new PriorityQueue<>(Comparator.comparingLong(PositionAndScore::score));
+        queue.add(positionAndScore);
+
+        while (!queue.isEmpty()) {
+            PositionAndScore current = queue.poll();
+            if (positionToScoreRecord.containsKey(current.position()) && positionToScoreRecord.get(current.position()) <= current.score()) {
+                continue;
+            }
+            positionToScoreRecord.insert(current);
+
+            for (PositionAndScore newPosAndScore : current.getNext(grid)) {
+                if (!positionToScoreRecord.containsKey(newPosAndScore.position()) || positionToScoreRecord.get(newPosAndScore.position()) > newPosAndScore.score()) {
+                    queue.add(newPosAndScore);
+                }
+            }
         }
     }
 
