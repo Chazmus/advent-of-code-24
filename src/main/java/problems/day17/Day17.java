@@ -8,7 +8,10 @@
 package problems.day17;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,52 +23,52 @@ public class Day17 extends ProblemBase {
     public Long solvePart1(List<String> inputArray) {
         var compooter = getCompooter(inputArray);
         compooter.run();
-        System.out.println(String.join(",", compooter.output.stream().map(String::valueOf).toList()));
+        Arrays.stream(compooter.output).asLongStream().forEach(x -> System.out.print("," + x));
         return 0L;
-    }
-
-    private Compooter getCompooter(List<String> inputArray) {
-        var computer = new Compooter();
-        for (var line : inputArray) {
-            if (line.startsWith("Register A: ")) {
-                computer.registerA = Integer.parseInt(line.split(": ")[1]);
-            }
-            if (line.startsWith("Register B: ")) {
-                computer.registerB = Integer.parseInt(line.split(": ")[1]);
-            }
-            if (line.startsWith("Register C: ")) {
-                computer.registerC = Integer.parseInt(line.split(": ")[1]);
-            }
-            if (line.startsWith("Program: ")) {
-                var program = line.split(": ")[1].split(",");
-                computer.program = new int[program.length];
-                for (var i = 0; i < program.length; i++) {
-                    computer.program[i] = Integer.parseInt(program[i]);
-                }
-            }
-        }
-        return computer;
     }
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        return 0L;
+        var compooter = getCompooter(inputArray);
+        compooter.setOutputSize(compooter.program.length);
+        var registerA = 0;
+        var originalRegisterA = 0;
+        while (!compooter.isSolved) {
+            registerA++; // probs not gonna be zero
+            compooter.reset(registerA);
+            originalRegisterA = registerA;
+            compooter.run();
+            if (registerA % 1000000 == 0) {
+                System.out.println(registerA);
+            }
+        }
+        var output = Arrays.stream(compooter.output)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.joining(","));
+        System.out.println(output);
+        return (long) originalRegisterA;
     }
 
 
     class Compooter {
 
-        int registerA;
-        int registerB;
-        int registerC;
+        boolean isSolved;
+        long registerA;
+        long registerB;
+        long registerC;
         int[] program;
+        int[] output;
+        int outputPointer;
         int instructionPointer;
-        List<Integer> output = new ArrayList<>();
 
+        public void setProgram(int[] program) {
+            this.program = program;
+            output = new int[16];
+        }
 
-        int getCombo(int input) {
+        long getCombo(int input) {
             return switch (input) {
-                case 0, 1, 2, 3 -> input;
+                case 0, 1, 2, 3 -> (long) input;
                 case 4 -> registerA;
                 case 5 -> registerB;
                 case 6 -> registerC;
@@ -73,8 +76,9 @@ public class Day17 extends ProblemBase {
             };
         }
 
+
         public void run() {
-            while (instructionPointer < program.length) {
+            while (instructionPointer < program.length && !isSolved) {
                 var opcode = Instruction.values()[program[instructionPointer]];
                 var operand = program[instructionPointer + 1];
                 switch (opcode) {
@@ -104,7 +108,8 @@ public class Day17 extends ProblemBase {
                         instructionPointer += 2;
                         break;
                     case out:
-                        output.add(getCombo(operand) % 8);
+                        output[outputPointer] = (int) (getCombo(operand) % 8);
+                        outputPointer++;
                         instructionPointer += 2;
                         break;
                     case bdv:
@@ -120,12 +125,48 @@ public class Day17 extends ProblemBase {
                         instructionPointer += 2;
                         break;
                 }
+                isSolved = Arrays.equals(output, program);
             }
+        }
+
+        public void setOutputSize(int length) {
+            output = new int[length];
+        }
+
+        public void reset(long registerA) {
+            instructionPointer = 0;
+            outputPointer = 0;
+            isSolved = false;
+            registerB = 0;
+            registerC = 0;
+            this.registerA = registerA;
+            Arrays.fill(output, 0);
         }
 
         enum Instruction {
             adv, bxl, bst, jnz, bxc, out, bdv, cdv
         }
+    }
+
+
+    private Compooter getCompooter(List<String> inputArray) {
+        var computer = new Compooter();
+        for (var line : inputArray) {
+            if (line.startsWith("Register A: ")) {
+                computer.registerA = Integer.parseInt(line.split(": ")[1]);
+            }
+            if (line.startsWith("Register B: ")) {
+                computer.registerB = Integer.parseInt(line.split(": ")[1]);
+            }
+            if (line.startsWith("Register C: ")) {
+                computer.registerC = Integer.parseInt(line.split(": ")[1]);
+            }
+            if (line.startsWith("Program: ")) {
+                var program = line.split(": ")[1].split(",");
+                computer.setProgram(Arrays.stream(program).mapToInt(Integer::parseInt).toArray());
+            }
+        }
+        return computer;
     }
 
     @Override
@@ -142,6 +183,13 @@ public class Day17 extends ProblemBase {
 
     @Override
     public Stream<Arguments> getPart2Examples() {
-        return Stream.empty();
+        return Stream.of(
+                Arguments.of("""
+                        Register A: 2024
+                        Register B: 0
+                        Register C: 0
+                        
+                        Program: 0,3,5,4,3,0""", 117440L)
+        );
     }
 }
