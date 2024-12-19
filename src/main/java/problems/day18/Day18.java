@@ -8,6 +8,8 @@
 package problems.day18;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,9 +21,9 @@ import utils.Vector2;
 public class Day18 extends ProblemBase {
     @Override
     public Long solvePart1(List<String> inputArray) {
+        var input = inputArray.subList(0, 1023);
         var grid = new Grid(71, 71, '.');
-        inputArray
-                .stream()
+        input.stream()
                 .forEach(line -> {
                     var coordStr = line.split(",");
                     var x = Integer.parseInt(coordStr[0]);
@@ -35,7 +37,30 @@ public class Day18 extends ProblemBase {
 
     @Override
     public Long solvePart2(List<String> inputArray) {
-        return 0L;
+        var grid = new Grid(71, 71, '.');
+        AtomicInteger finalX = new AtomicInteger();
+        AtomicInteger finalY = new AtomicInteger();
+        AtomicBoolean found = new AtomicBoolean(false);
+        inputArray.stream()
+                .forEach(line -> {
+                    if (found.get()) {
+                        return;
+                    }
+                    var coordStr = line.split(",");
+                    var x = Integer.parseInt(coordStr[0]);
+                    var y = Integer.parseInt(coordStr[1]);
+                    grid.set(x, y, '#');
+                    var start = new Vector2(0, 0);
+                    var end = new Vector2(70, 70);
+                    if (grid.findShortestPath(start, end) == null) {
+                        finalX.set(x);
+                        finalY.set(y);
+                        found.set(true);
+                    }
+                });
+        var xStr = finalX.toString();
+        var yStr = finalY.toString();
+        return Long.parseLong(xStr + yStr);
     }
 
     @Override
