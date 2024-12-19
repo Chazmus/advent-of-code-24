@@ -2,8 +2,14 @@ package utils;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -242,6 +248,52 @@ public class Grid {
             }
             writer.write("\n");
         }
+    }
+
+    public Integer findShortestPath(Vector2 start, Vector2 end) {
+        var solution = dijkstra(start, end);
+        return solution;
+    }
+
+
+    private Integer dijkstra(Vector2 start, Vector2 end) {
+        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(Node::cost));
+        Map<Vector2, Integer> distances = new HashMap<>();
+        Set<Vector2> visited = new HashSet<>();
+
+        queue.add(new Node(start, 0));
+        distances.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Node current = queue.poll();
+            Vector2 currentPos = current.position();
+
+            if (visited.contains(currentPos)) {
+                continue;
+            }
+            visited.add(currentPos);
+
+            if (currentPos.equals(end)) {
+                return current.cost();
+            }
+
+            for (Vector2 direction : List.of(
+                    new Vector2(0, 1), new Vector2(1, 0),
+                    new Vector2(0, -1), new Vector2(-1, 0))) {
+                Vector2 neighbor = currentPos.add(direction);
+                if (isWithinBounds(neighbor) && get(neighbor) == '.') {
+                    int newCost = current.cost() + 1;
+                    if (newCost < distances.getOrDefault(neighbor, Integer.MAX_VALUE)) {
+                        distances.put(neighbor, newCost);
+                        queue.add(new Node(neighbor, newCost));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private record Node(Vector2 position, int cost) {
     }
 
     public record Cell(Vector2 position, Character value) {
